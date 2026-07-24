@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>우리 아이 플래시카드 만들기</title>
+</head>
+<body>
+<style>
+  :root {
+    --paper: #F3F2F7;
+    --surface: #FFFFFF;
+    --surface-2: #FAFAFD;
+    --ink: #262430;
+    --muted: #6B6779;
+    --line: #E5E3EC;
+    --accent: #5B62C4;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #ECEDFB;
+    --shadow: 0 1px 2px rgba(38,36,48,.06), 0 8px 24px rgba(38,36,48,.06);
+    --radius: 16px;
+    /* category colors */
+    --c-hangul: #5B62C4;
+    --c-number: #1F9C8B;
+    --c-animal: #4E9C5B;
+    --c-color:  #C9599B;
+    --c-fruit:  #D65D5D;
+    --c-body:   #E08A3C;
+    --c-custom: #6E6A7A;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #17161E;
+      --surface: #201F2A;
+      --surface-2: #191822;
+      --ink: #ECEAF3;
+      --muted: #A29EB2;
+      --line: #322F40;
+      --accent: #8A90EC;
+      --accent-ink: #14131B;
+      --accent-soft: #2A2A46;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+      --c-hangul: #8A90EC;
+      --c-number: #3FC0AC;
+      --c-animal: #6ABD77;
+      --c-color:  #E27CB6;
+      --c-fruit:  #EA7C7C;
+      --c-body:   #EEA45C;
+      --c-custom: #9A96A8;
+    }
+  }
+  :root[data-theme="light"] {
+    --paper: #F3F2F7; --surface: #FFFFFF; --surface-2: #FAFAFD; --ink: #262430;
+    --muted: #6B6779; --line: #E5E3EC; --accent: #5B62C4; --accent-ink:#FFFFFF;
+    --accent-soft: #ECEDFB; --shadow: 0 1px 2px rgba(38,36,48,.06), 0 8px 24px rgba(38,36,48,.06);
+    --c-hangul:#5B62C4; --c-number:#1F9C8B; --c-animal:#4E9C5B; --c-color:#C9599B;
+    --c-fruit:#D65D5D; --c-body:#E08A3C; --c-custom:#6E6A7A;
+  }
+  :root[data-theme="dark"] {
+    --paper: #17161E; --surface: #201F2A; --surface-2:#191822; --ink: #ECEAF3;
+    --muted: #A29EB2; --line: #322F40; --accent: #8A90EC; --accent-ink:#14131B;
+    --accent-soft: #2A2A46; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    --c-hangul:#8A90EC; --c-number:#3FC0AC; --c-animal:#6ABD77; --c-color:#E27CB6;
+    --c-fruit:#EA7C7C; --c-body:#EEA45C; --c-custom:#9A96A8;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", "Noto Sans KR", system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 32px 20px 80px; }
+
+  .app-header { margin-bottom: 24px; }
+  .eyebrow {
+    font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent); font-weight: 700; margin: 0 0 8px;
+  }
+  h1 { font-size: clamp(26px, 4vw, 38px); margin: 0 0 8px; letter-spacing: -.02em; text-wrap: balance; }
+  .lede { color: var(--muted); margin: 0; max-width: 60ch; }
+
+  .layout { display: grid; grid-template-columns: 340px 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 20px;
+  }
+  .panel + .panel { margin-top: 16px; }
+  .panel h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 14px; font-weight: 700; }
+
+  /* category tabs */
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tab {
+    appearance: none; border: 1px solid var(--line); background: var(--surface-2);
+    color: var(--ink); padding: 8px 12px; border-radius: 999px; font-size: 14px;
+    cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 6px;
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  .tab .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--tc, var(--accent)); }
+  .tab:hover { border-color: var(--accent); }
+  .tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .tab[aria-selected="true"] .dot { background: var(--accent-ink); }
+
+  .chip-head { display:flex; justify-content: space-between; align-items:center; margin: 16px 0 10px; }
+  .chip-head .count { font-size: 13px; color: var(--muted); }
+  .link-btn { background:none; border:none; color: var(--accent); font-family:inherit; font-size:13px; cursor:pointer; padding:4px 6px; border-radius:8px; font-weight:600; }
+  .link-btn:hover { background: var(--accent-soft); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    display:inline-flex; align-items:center; gap:7px; cursor:pointer; user-select:none;
+    border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
+    padding: 7px 11px; border-radius: 10px; font-size: 14px; transition: all .12s;
+  }
+  .chip .ce { font-size: 16px; line-height: 1; }
+  .chip[data-on="true"] { border-color: var(--accent); background: var(--accent-soft); }
+  .chip .box {
+    width: 16px; height: 16px; border-radius: 5px; border: 1.5px solid var(--line);
+    display:grid; place-items:center; flex: 0 0 auto;
+  }
+  .chip[data-on="true"] .box { background: var(--accent); border-color: var(--accent); }
+  .chip[data-on="true"] .box::after { content:"✓"; color: var(--accent-ink); font-size: 11px; font-weight: 800; }
+
+  textarea.custom {
+    width:100%; min-height: 96px; resize: vertical; border:1px solid var(--line);
+    border-radius: 10px; background: var(--surface-2); color: var(--ink);
+    padding: 10px 12px; font-family: inherit; font-size: 14px; line-height: 1.6;
+  }
+  textarea.custom:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  .hint { font-size: 12.5px; color: var(--muted); margin: 8px 0 0; }
+
+  /* options */
+  .opt-row { display:flex; flex-direction: column; gap: 14px; }
+  .seg-label { font-size: 13px; color: var(--muted); margin-bottom: 7px; font-weight:600; }
+  .seg { display:inline-flex; background: var(--surface-2); border:1px solid var(--line); border-radius: 10px; padding: 3px; gap: 3px; }
+  .seg button {
+    appearance:none; border:none; background:none; color: var(--ink); font-family:inherit;
+    font-size:14px; padding: 6px 14px; border-radius: 8px; cursor:pointer;
+  }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .toggles { display:flex; flex-direction:column; gap:10px; }
+  .toggle { display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:14px; }
+  .switch { position: relative; width: 42px; height: 24px; flex: 0 0 auto; }
+  .switch input { position:absolute; opacity:0; width:100%; height:100%; margin:0; cursor:pointer; }
+  .switch .track { position:absolute; inset:0; background: var(--line); border-radius: 999px; transition: background .15s; }
+  .switch .knob { position:absolute; top:3px; left:3px; width:18px; height:18px; background:#fff; border-radius:50%; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+  .switch input:checked + .track { background: var(--accent); }
+  .switch input:checked + .track + .knob { transform: translateX(18px); }
+  .switch input:focus-visible + .track { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* preview / toolbar */
+  .stage-head { display:flex; align-items:center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .stage-head .meta { color: var(--muted); font-size: 14px; }
+  .btn {
+    appearance:none; border:1px solid var(--accent); background: var(--accent); color: var(--accent-ink);
+    font-family: inherit; font-size: 15px; font-weight: 700; padding: 11px 20px; border-radius: 12px;
+    cursor: pointer; display:inline-flex; align-items:center; gap:8px; box-shadow: var(--shadow);
+    transition: filter .15s, transform .05s;
+  }
+  .btn:hover { filter: brightness(1.05); }
+  .btn:active { transform: translateY(1px); }
+  .btn.ghost { background: var(--surface); color: var(--ink); border-color: var(--line); box-shadow:none; }
+
+  .preview {
+    display:grid; gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+  .empty {
+    border: 2px dashed var(--line); border-radius: var(--radius); padding: 48px 20px;
+    text-align:center; color: var(--muted);
+  }
+
+  /* CARD */
+  .card {
+    --cc: var(--accent);
+    background: #fff; color: #1a1a1a; border: 3px solid var(--cc); border-radius: 14px;
+    aspect-ratio: 3 / 4; display:flex; flex-direction: column; align-items:center; justify-content:center;
+    text-align:center; padding: 14px; gap: 8px; overflow:hidden;
+  }
+  .card .visual { font-size: clamp(40px, 9vw, 72px); line-height: 1; }
+  .card .swatch { width: 60%; aspect-ratio: 1; border-radius: 14px; border: 2px solid rgba(0,0,0,.12); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .card .dots { display:grid; grid-template-columns: repeat(auto-fit, 16px); gap: 7px; justify-content:center; max-width: 78%; }
+  .card .dots i { width:16px; height:16px; border-radius:50%; background: var(--cc); display:block; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .card .word { font-size: clamp(24px, 6vw, 40px); font-weight: 800; letter-spacing: -.01em; color:#1a1a1a; }
+  .card.big .word { font-size: clamp(30px, 8vw, 52px); }
+  .card .num { font-size: clamp(44px, 11vw, 80px); font-weight: 800; color: var(--cc); line-height:1; }
+  .card .sub { font-size: clamp(12px, 3vw, 16px); color:#7a7a7a; text-transform: capitalize; letter-spacing:.02em; }
+
+  /* coloring (black & white, crayon-friendly) mode */
+  .coloring .card { border-color:#111 !important; background:#fff; }
+  .coloring .card .word {
+    color: transparent; -webkit-text-stroke: 2px #111; text-stroke: 2px #111; font-weight: 800;
+  }
+  .coloring .card.big .word { -webkit-text-stroke-width: 2.5px; }
+  .coloring .card .visual { filter: grayscale(1); opacity: .24; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .coloring .card .num { color: transparent; -webkit-text-stroke: 2.5px #111; }
+  .coloring .card .dots i { background: transparent !important; border: 2px solid #111; }
+  .coloring .card .swatch { background: transparent !important; border: 2px dashed #111; }
+  .coloring .card .sub { color:#111; opacity:.45; }
+
+  /* print sheet hidden on screen */
+  .sheet { display: none; }
+
+  .tips { margin-top: 28px; }
+  .tips ul { margin: 0; padding-left: 20px; color: var(--muted); }
+  .tips li { margin: 6px 0; }
+  .tips li b { color: var(--ink); font-weight: 700; }
+
+  @media print {
+    .wrap, .app-header, .layout, .tips { display: none !important; }
+    body { background:#fff; }
+    .sheet { display: flex !important; flex-wrap: wrap; align-content: flex-start; gap: 0; }
+    .sheet .card {
+      break-inside: avoid; margin: 0; border-radius: 12px;
+      box-shadow: none; background:#fff;
+    }
+    .sheet.per-4 .card { width: 50%; height: 138mm; aspect-ratio:auto; }
+    .sheet.per-2 .card { width: 100%; height: 138mm; aspect-ratio:auto; }
+    .sheet.per-1 .card { width: 100%; height: 277mm; aspect-ratio:auto; }
+    .sheet.cut .card { outline: 1px dashed #bbb; outline-offset: 4px; }
+    .sheet .card .word { font-size: 40pt; }
+    .sheet.per-1 .card .word { font-size: 72pt; }
+    .sheet .card .visual { font-size: 96pt; }
+    .sheet.per-1 .card .visual { font-size: 200pt; }
+    .sheet .card .num { font-size: 90pt; }
+    .sheet .card .sub { font-size: 15pt; }
+    @page { size: A4 portrait; margin: 8mm; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="app-header">
+    <p class="eyebrow">부모용 · 화면 노출 없는 학습 도구</p>
+    <h1>우리 아이 플래시카드 만들기</h1>
+    <p class="lede">보여줄 낱말을 고르고 인쇄하면, 아이는 화면 대신 종이 카드로 배웁니다. 만 2세 전후 첫 낱말·숫자·동물·색깔에 맞춰 크게 나옵니다.</p>
+  </header>
+
+  <div class="layout">
+    <div class="col-controls">
+      <section class="panel">
+        <h2>1. 주제 고르기</h2>
+        <div class="tabs" id="tabs" role="tablist"></div>
+
+        <div id="pickerArea">
+          <div class="chip-head">
+            <span class="count" id="selCount">0개 선택됨</span>
+            <div>
+              <button class="link-btn" id="selAll">모두 선택</button>
+              <button class="link-btn" id="selNone">해제</button>
+            </div>
+          </div>
+          <div class="chips" id="chips"></div>
+        </div>
+
+        <div id="customArea" hidden>
+          <textarea class="custom" id="customText" placeholder="한 줄에 하나씩 적어주세요&#10;우유, 🥛&#10;할머니&#10;기차, 🚂"></textarea>
+          <p class="hint">낱말 뒤에 쉼표(,)를 찍고 이모지를 넣으면 그림도 함께 나와요. 이모지는 생략해도 됩니다.</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>2. 인쇄 설정</h2>
+        <div class="opt-row">
+          <div>
+            <div class="seg-label">한 장에 카드 수 (A4 기준)</div>
+            <div class="seg" id="perPage" role="group" aria-label="한 장에 카드 수">
+              <button data-v="4" aria-pressed="true">4장</button>
+              <button data-v="2" aria-pressed="false">2장</button>
+              <button data-v="1" aria-pressed="false">1장</button>
+            </div>
+          </div>
+          <div class="toggles">
+            <label class="toggle">그림(이모지) 보이기
+              <span class="switch"><input type="checkbox" id="optEmoji" checked><span class="track"></span><span class="knob"></span></span>
+            </label>
+            <label class="toggle">영어 함께 보이기
+              <span class="switch"><input type="checkbox" id="optEng" checked><span class="track"></span><span class="knob"></span></span>
+            </label>
+            <label class="toggle">글자 아주 크게
+              <span class="switch"><input type="checkbox" id="optBig"><span class="track"></span><span class="knob"></span></span>
+            </label>
+            <label class="toggle">자르는 선 표시
+              <span class="switch"><input type="checkbox" id="optCut" checked><span class="track"></span><span class="knob"></span></span>
+            </label>
+            <label class="toggle">색칠 도안 (흑백 · 크레용용)
+              <span class="switch"><input type="checkbox" id="optColor"><span class="track"></span><span class="knob"></span></span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel tips">
+        <h2>이렇게 활용하세요</h2>
+        <ul>
+          <li><b>두꺼운 종이</b>에 인쇄하고, 가능하면 코팅해서 오래 쓰세요.</li>
+          <li>한 번에 <b>한 장씩</b> 보여주며 또박또박 이름을 말해주세요.</li>
+          <li>아이가 손으로 <b>만지고 넘기게</b> 두면 소근육 발달에도 좋아요.</li>
+          <li>화면은 부모만, 아이는 <b>종이와 목소리</b>로 — 그게 이 도구의 목적이에요.</li>
+        </ul>
+      </section>
+    </div>
+
+    <div class="col-stage">
+      <section class="panel">
+        <div class="stage-head">
+          <span class="meta" id="stageMeta">미리보기</span>
+          <div style="display:flex; gap:10px;">
+            <button class="btn ghost" id="themeBtn" type="button">테마</button>
+            <button class="btn" id="printBtn" type="button">🖨️ 인쇄하기</button>
+          </div>
+        </div>
+        <div class="preview" id="preview"></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div class="sheet per-4 cut" id="sheet" aria-hidden="true"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  const DECKS = {
+    hangul: { label: "한글 낱말", tc: "var(--c-hangul)", cc: "var(--c-hangul)", items: [
+      { ko:"엄마", en:"mom", e:"🤱" }, { ko:"아빠", en:"dad", e:"👨" },
+      { ko:"물", en:"water", e:"💧" }, { ko:"밥", en:"rice", e:"🍚" },
+      { ko:"공", en:"ball", e:"⚽" }, { ko:"자동차", en:"car", e:"🚗" },
+      { ko:"신발", en:"shoes", e:"👟" }, { ko:"모자", en:"hat", e:"🧢" },
+      { ko:"우유", en:"milk", e:"🥛" }, { ko:"양말", en:"socks", e:"🧦" },
+      { ko:"컵", en:"cup", e:"🥤" }, { ko:"책", en:"book", e:"📖" },
+    ]},
+    number: { label: "숫자", tc: "var(--c-number)", cc: "var(--c-number)", type:"number", items: [
+      { n:1, ko:"하나", en:"one" }, { n:2, ko:"둘", en:"two" }, { n:3, ko:"셋", en:"three" },
+      { n:4, ko:"넷", en:"four" }, { n:5, ko:"다섯", en:"five" }, { n:6, ko:"여섯", en:"six" },
+      { n:7, ko:"일곱", en:"seven" }, { n:8, ko:"여덟", en:"eight" }, { n:9, ko:"아홉", en:"nine" },
+      { n:10, ko:"열", en:"ten" },
+    ]},
+    animal: { label: "동물", tc: "var(--c-animal)", cc: "var(--c-animal)", items: [
+      { ko:"강아지", en:"dog", e:"🐶" }, { ko:"고양이", en:"cat", e:"🐱" },
+      { ko:"토끼", en:"rabbit", e:"🐰" }, { ko:"곰", en:"bear", e:"🐻" },
+      { ko:"사자", en:"lion", e:"🦁" }, { ko:"코끼리", en:"elephant", e:"🐘" },
+      { ko:"원숭이", en:"monkey", e:"🐵" }, { ko:"오리", en:"duck", e:"🦆" },
+      { ko:"물고기", en:"fish", e:"🐟" }, { ko:"개구리", en:"frog", e:"🐸" },
+      { ko:"돼지", en:"pig", e:"🐷" }, { ko:"병아리", en:"chick", e:"🐤" },
+    ]},
+    color: { label: "색깔", tc: "var(--c-color)", cc: "var(--c-color)", type:"color", items: [
+      { ko:"빨강", en:"red", sw:"#E23B3B" }, { ko:"주황", en:"orange", sw:"#F08A3C" },
+      { ko:"노랑", en:"yellow", sw:"#F4C932" }, { ko:"초록", en:"green", sw:"#46A85B" },
+      { ko:"파랑", en:"blue", sw:"#3E7BE0" }, { ko:"보라", en:"purple", sw:"#8A5CD1" },
+      { ko:"분홍", en:"pink", sw:"#EF7FB0" }, { ko:"갈색", en:"brown", sw:"#9C6B4A" },
+      { ko:"검정", en:"black", sw:"#222222" }, { ko:"하양", en:"white", sw:"#FFFFFF" },
+    ]},
+    fruit: { label: "과일·먹을거리", tc: "var(--c-fruit)", cc: "var(--c-fruit)", items: [
+      { ko:"사과", en:"apple", e:"🍎" }, { ko:"바나나", en:"banana", e:"🍌" },
+      { ko:"딸기", en:"strawberry", e:"🍓" }, { ko:"포도", en:"grapes", e:"🍇" },
+      { ko:"수박", en:"watermelon", e:"🍉" }, { ko:"귤", en:"tangerine", e:"🍊" },
+      { ko:"빵", en:"bread", e:"🍞" }, { ko:"계란", en:"egg", e:"🥚" },
+      { ko:"당근", en:"carrot", e:"🥕" }, { ko:"우유", en:"milk", e:"🥛" },
+    ]},
+    body: { label: "몸", tc: "var(--c-body)", cc: "var(--c-body)", items: [
+      { ko:"눈", en:"eyes", e:"👀" }, { ko:"코", en:"nose", e:"👃" },
+      { ko:"입", en:"mouth", e:"👄" }, { ko:"귀", en:"ears", e:"👂" },
+      { ko:"손", en:"hand", e:"✋" }, { ko:"발", en:"foot", e:"🦶" },
+      { ko:"이", en:"teeth", e:"🦷" }, { ko:"머리", en:"head", e:"🧠" },
+    ]},
+    custom: { label: "직접 입력", tc: "var(--c-custom)", cc: "var(--c-custom)", type:"custom", items: [] },
+  };
+  const ORDER = ["hangul","number","animal","color","fruit","body","custom"];
+
+  const state = {
+    active: "hangul",
+    selected: {},     // deckKey -> Set of indices
+    perPage: 4,
+    emoji: true, eng: true, big: false, cut: true, coloring: false,
+    custom: [],
+  };
+  ORDER.forEach(k => { state.selected[k] = new Set(DECKS[k].items.map((_, i) => i)); });
+
+  const $ = s => document.querySelector(s);
+  const el = (t, cls) => { const n = document.createElement(t); if (cls) n.className = cls; return n; };
+
+  // ---- tabs ----
+  const tabsEl = $("#tabs");
+  ORDER.forEach(key => {
+    const b = el("button", "tab");
+    b.setAttribute("role", "tab");
+    b.dataset.key = key;
+    b.style.setProperty("--tc", DECKS[key].tc);
+    b.innerHTML = '<span class="dot"></span>' + DECKS[key].label;
+    b.addEventListener("click", () => { state.active = key; renderTabs(); renderPicker(); renderPreview(); });
+    tabsEl.appendChild(b);
+  });
+  function renderTabs() {
+    [...tabsEl.children].forEach(b => b.setAttribute("aria-selected", b.dataset.key === state.active));
+  }
+
+  // ---- picker ----
+  function parseCustom() {
+    const lines = $("#customText").value.split("\n").map(s => s.trim()).filter(Boolean);
+    state.custom = lines.map(line => {
+      const parts = line.split(",");
+      const ko = (parts[0] || "").trim();
+      const e = (parts[1] || "").trim();
+      return { ko, en:"", e };
+    }).filter(x => x.ko);
+    DECKS.custom.items = state.custom;
+    state.selected.custom = new Set(state.custom.map((_, i) => i));
+  }
+
+  function renderPicker() {
+    const isCustom = state.active === "custom";
+    $("#pickerArea").hidden = isCustom;
+    $("#customArea").hidden = !isCustom;
+    if (isCustom) { updateCount(); return; }
+    const deck = DECKS[state.active];
+    const sel = state.selected[state.active];
+    const box = $("#chips");
+    box.innerHTML = "";
+    deck.items.forEach((it, i) => {
+      const c = el("div", "chip");
+      c.dataset.on = sel.has(i);
+      const label = it.ko + (deck.type === "number" ? " ("+it.n+")" : "");
+      const emo = it.e ? '<span class="ce">'+it.e+'</span>' : (it.sw ? '<span class="ce" style="display:inline-block;width:14px;height:14px;border-radius:4px;border:1px solid rgba(0,0,0,.2);background:'+it.sw+'"></span>' : "");
+      c.innerHTML = '<span class="box"></span>'+emo+'<span>'+label+'</span>';
+      c.addEventListener("click", () => {
+        if (sel.has(i)) sel.delete(i); else sel.add(i);
+        c.dataset.on = sel.has(i);
+        updateCount(); renderPreview();
+      });
+      box.appendChild(c);
+    });
+    updateCount();
+  }
+  function updateCount() {
+    const n = state.active === "custom" ? state.custom.length : state.selected[state.active].size;
+    $("#selCount").textContent = n + "개 선택됨";
+  }
+
+  $("#selAll").addEventListener("click", () => {
+    const deck = DECKS[state.active];
+    state.selected[state.active] = new Set(deck.items.map((_, i) => i));
+    renderPicker(); renderPreview();
+  });
+  $("#selNone").addEventListener("click", () => {
+    state.selected[state.active] = new Set();
+    renderPicker(); renderPreview();
+  });
+  $("#customText").addEventListener("input", () => { parseCustom(); updateCount(); renderPreview(); });
+
+  // ---- card builder ----
+  function buildCard(deck, it) {
+    const card = el("div", "card" + (state.big ? " big" : ""));
+    card.style.setProperty("--cc", deck.cc);
+
+    if (deck.type === "number") {
+      if (state.emoji) {
+        const dots = el("div", "dots");
+        for (let k = 0; k < it.n; k++) dots.appendChild(el("i"));
+        card.appendChild(dots);
+      }
+      const num = el("div", "num"); num.textContent = it.n; card.appendChild(num);
+      const w = el("div", "word"); w.textContent = it.ko; card.appendChild(w);
+      if (state.eng) { const s = el("div", "sub"); s.textContent = it.en; card.appendChild(s); }
+      return card;
+    }
+    if (deck.type === "color") {
+      const sw = el("div", "swatch"); sw.style.background = it.sw;
+      if (it.sw.toLowerCase() === "#ffffff") sw.style.borderColor = "rgba(0,0,0,.25)";
+      card.appendChild(sw);
+      const w = el("div", "word"); w.textContent = it.ko; card.appendChild(w);
+      if (state.eng) { const s = el("div", "sub"); s.textContent = it.en; card.appendChild(s); }
+      return card;
+    }
+    if (state.emoji && it.e) { const v = el("div", "visual"); v.textContent = it.e; card.appendChild(v); }
+    const w = el("div", "word"); w.textContent = it.ko; card.appendChild(w);
+    if (state.eng && it.en) { const s = el("div", "sub"); s.textContent = it.en; card.appendChild(s); }
+    return card;
+  }
+
+  function selectedItems() {
+    const deck = DECKS[state.active];
+    if (state.active === "custom") return deck.items.map((it, i) => ({ deck, it }));
+    const sel = state.selected[state.active];
+    return deck.items.map((it, i) => sel.has(i) ? { deck, it } : null).filter(Boolean);
+  }
+
+  function renderPreview() {
+    const items = selectedItems();
+    const prev = $("#preview");
+    prev.classList.toggle("coloring", state.coloring);
+    prev.innerHTML = "";
+    if (!items.length) {
+      const e = el("div", "empty");
+      e.style.gridColumn = "1 / -1";
+      e.textContent = state.active === "custom"
+        ? "왼쪽에 낱말을 한 줄에 하나씩 입력하면 카드가 나타나요."
+        : "카드를 하나 이상 선택하면 여기에 미리보기가 나와요.";
+      prev.appendChild(e);
+    } else {
+      items.forEach(({ deck, it }) => prev.appendChild(buildCard(deck, it)));
+    }
+    $("#stageMeta").textContent = items.length ? (items.length + "장 · 한 장에 " + state.perPage + "칸") : "미리보기";
+
+    // build print sheet
+    const sheet = $("#sheet");
+    sheet.className = "sheet per-" + state.perPage + (state.cut ? " cut" : "") + (state.coloring ? " coloring" : "");
+    sheet.innerHTML = "";
+    items.forEach(({ deck, it }) => sheet.appendChild(buildCard(deck, it)));
+  }
+
+  // ---- options ----
+  $("#perPage").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    state.perPage = +b.dataset.v;
+    [...$("#perPage").children].forEach(x => x.setAttribute("aria-pressed", x === b));
+    renderPreview();
+  });
+  const bind = (id, key) => $(id).addEventListener("change", e => { state[key] = e.target.checked; renderPreview(); });
+  bind("#optEmoji", "emoji"); bind("#optEng", "eng"); bind("#optBig", "big"); bind("#optCut", "cut"); bind("#optColor", "coloring");
+
+  $("#printBtn").addEventListener("click", () => {
+    if (!selectedItems().length) { alert("먼저 카드를 하나 이상 선택하거나 입력해 주세요."); return; }
+    window.print();
+  });
+
+  // theme toggle
+  $("#themeBtn").addEventListener("click", () => {
+    const root = document.documentElement;
+    const now = root.getAttribute("data-theme")
+      || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    root.setAttribute("data-theme", now === "dark" ? "light" : "dark");
+  });
+
+  // init
+  renderTabs(); renderPicker(); renderPreview();
+})();
+</script>
+</body>
+</html>
