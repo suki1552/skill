@@ -184,13 +184,25 @@
     text-align:center; padding: 14px; gap: 8px; overflow:hidden;
   }
   .card .visual { font-size: clamp(40px, 9vw, 72px); line-height: 1; }
-  .card .swatch { width: 60%; aspect-ratio: 1; border-radius: 14px; border: 2px solid rgba(0,0,0,.12); }
+  .card .swatch { width: 60%; aspect-ratio: 1; border-radius: 14px; border: 2px solid rgba(0,0,0,.12); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .card .dots { display:grid; grid-template-columns: repeat(auto-fit, 16px); gap: 7px; justify-content:center; max-width: 78%; }
-  .card .dots i { width:16px; height:16px; border-radius:50%; background: var(--cc); display:block; }
+  .card .dots i { width:16px; height:16px; border-radius:50%; background: var(--cc); display:block; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .card .word { font-size: clamp(24px, 6vw, 40px); font-weight: 800; letter-spacing: -.01em; color:#1a1a1a; }
   .card.big .word { font-size: clamp(30px, 8vw, 52px); }
   .card .num { font-size: clamp(44px, 11vw, 80px); font-weight: 800; color: var(--cc); line-height:1; }
   .card .sub { font-size: clamp(12px, 3vw, 16px); color:#7a7a7a; text-transform: capitalize; letter-spacing:.02em; }
+
+  /* coloring (black & white, crayon-friendly) mode */
+  .coloring .card { border-color:#111 !important; background:#fff; }
+  .coloring .card .word {
+    color: transparent; -webkit-text-stroke: 2px #111; text-stroke: 2px #111; font-weight: 800;
+  }
+  .coloring .card.big .word { -webkit-text-stroke-width: 2.5px; }
+  .coloring .card .visual { filter: grayscale(1); opacity: .24; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .coloring .card .num { color: transparent; -webkit-text-stroke: 2.5px #111; }
+  .coloring .card .dots i { background: transparent !important; border: 2px solid #111; }
+  .coloring .card .swatch { background: transparent !important; border: 2px dashed #111; }
+  .coloring .card .sub { color:#111; opacity:.45; }
 
   /* print sheet hidden on screen */
   .sheet { display: none; }
@@ -275,6 +287,9 @@
             </label>
             <label class="toggle">자르는 선 표시
               <span class="switch"><input type="checkbox" id="optCut" checked><span class="track"></span><span class="knob"></span></span>
+            </label>
+            <label class="toggle">색칠 도안 (흑백 · 크레용용)
+              <span class="switch"><input type="checkbox" id="optColor"><span class="track"></span><span class="knob"></span></span>
             </label>
           </div>
         </div>
@@ -363,7 +378,7 @@
     active: "hangul",
     selected: {},     // deckKey -> Set of indices
     perPage: 4,
-    emoji: true, eng: true, big: false, cut: true,
+    emoji: true, eng: true, big: false, cut: true, coloring: false,
     custom: [],
   };
   ORDER.forEach(k => { state.selected[k] = new Set(DECKS[k].items.map((_, i) => i)); });
@@ -479,6 +494,7 @@
   function renderPreview() {
     const items = selectedItems();
     const prev = $("#preview");
+    prev.classList.toggle("coloring", state.coloring);
     prev.innerHTML = "";
     if (!items.length) {
       const e = el("div", "empty");
@@ -494,7 +510,7 @@
 
     // build print sheet
     const sheet = $("#sheet");
-    sheet.className = "sheet per-" + state.perPage + (state.cut ? " cut" : "");
+    sheet.className = "sheet per-" + state.perPage + (state.cut ? " cut" : "") + (state.coloring ? " coloring" : "");
     sheet.innerHTML = "";
     items.forEach(({ deck, it }) => sheet.appendChild(buildCard(deck, it)));
   }
@@ -507,7 +523,7 @@
     renderPreview();
   });
   const bind = (id, key) => $(id).addEventListener("change", e => { state[key] = e.target.checked; renderPreview(); });
-  bind("#optEmoji", "emoji"); bind("#optEng", "eng"); bind("#optBig", "big"); bind("#optCut", "cut");
+  bind("#optEmoji", "emoji"); bind("#optEng", "eng"); bind("#optBig", "big"); bind("#optCut", "cut"); bind("#optColor", "coloring");
 
   $("#printBtn").addEventListener("click", () => {
     if (!selectedItems().length) { alert("먼저 카드를 하나 이상 선택하거나 입력해 주세요."); return; }
