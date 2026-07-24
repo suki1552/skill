@@ -6,25 +6,22 @@
 <title>OB 콜봇 스케줄링 관리 대시보드</title>
 <style>
   :root{
-    --primary:#5B4FE8;--primary-d:#3D34B0;--accent:#00C9A7;--accent-d:#00A98C;
-    --ink:#1E1B39;--muted:#6B7280;--line:#E9EAF2;--bg:#F5F6FB;
-    --css:#5B4FE8;--oss:#F0526B;--warn:#F5A524;--ok:#12B886;
+    --primary:#5B4FE8;--primary-d:#3D34B0;--accent:#00C9A7;--ink:#1E1B39;--muted:#6B7280;
+    --line:#E9EAF2;--bg:#F5F6FB;--css:#5B4FE8;--oss:#F0526B;--warn:#F5A524;--ok:#12B886;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Malgun Gothic','Apple SD Gothic Neo',system-ui,sans-serif;background:var(--bg);color:var(--ink)}
   .app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
   @media(max-width:820px){.app{grid-template-columns:1fr}.side{display:none}}
-  /* sidebar */
   .side{background:linear-gradient(180deg,#1c1743,#241a5c);color:#fff;padding:22px 16px;position:sticky;top:0;height:100vh}
   .brand{display:flex;align-items:center;gap:11px;margin-bottom:26px}
   .brand .lg{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--primary),var(--accent));display:grid;place-items:center;font-size:19px}
   .brand b{font-size:15px}.brand small{font-size:10.5px;opacity:.7;display:block}
-  .nav a{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;color:#cfcbe8;text-decoration:none;font-size:13.5px;margin-bottom:4px}
+  .nav a{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;color:#cfcbe8;text-decoration:none;font-size:13.5px;margin-bottom:4px;cursor:pointer}
   .nav a.on{background:rgba(255,255,255,.12);color:#fff;font-weight:700}
   .nav a:hover{background:rgba(255,255,255,.07);color:#fff}
   .side .foot{position:absolute;bottom:20px;left:16px;right:16px;font-size:11px;opacity:.6;line-height:1.6}
   .side .foot a{color:var(--accent);text-decoration:none}
-  /* main */
   .main{padding:24px 26px}
   .hbar{display:flex;align-items:center;gap:12px;margin-bottom:22px;flex-wrap:wrap}
   .hbar h1{font-size:21px;letter-spacing:-.3px}.hbar p{font-size:12.5px;color:var(--muted)}
@@ -32,7 +29,6 @@
   .live .d{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:bl 1.2s infinite}
   @keyframes bl{50%{opacity:.3}}
   .home{font-size:12.5px;color:var(--primary);text-decoration:none;font-weight:700;border:1px solid var(--line);background:#fff;padding:7px 13px;border-radius:10px}
-  /* kpi cards */
   .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
   @media(max-width:960px){.kpis{grid-template-columns:repeat(2,1fr)}}
   .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 8px 22px rgba(30,27,57,.04)}
@@ -40,45 +36,64 @@
   .kpi .ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:18px}
   .kpi .n{font-size:30px;font-weight:800;margin-top:10px;letter-spacing:-1px}
   .kpi .l{font-size:12.5px;color:var(--muted);margin-top:2px}
-  .kpi .chg{font-size:11.5px;font-weight:700;margin-top:7px}
+  .kpi .chg{font-size:11.5px;font-weight:700}
   .up{color:var(--ok)}.down{color:var(--oss)}
-  /* layout row */
   .row2{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:16px}
   @media(max-width:960px){.row2{grid-template-columns:1fr}}
   .card h3{font-size:14px;margin-bottom:3px}.card .sub{font-size:11.5px;color:var(--muted);margin-bottom:16px}
-  /* bar chart */
   .bars{display:flex;align-items:flex-end;gap:14px;height:190px;padding:0 4px}
   .barcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;height:100%;justify-content:flex-end}
-  .barstack{width:60%;max-width:44px;border-radius:7px 7px 0 0;display:flex;flex-direction:column-reverse;overflow:hidden;transition:1s}
+  .barstack{width:60%;max-width:44px;border-radius:7px 7px 0 0;display:flex;flex-direction:column-reverse;overflow:hidden;transition:.8s}
   .barstack .seg{width:100%}
-  .barcol .x{font-size:11px;color:var(--muted)}
-  .barcol .v{font-size:12px;font-weight:800}
+  .barcol .x{font-size:11px;color:var(--muted)}.barcol .v{font-size:12px;font-weight:800}
   .lg{display:flex;gap:16px;margin-top:14px;font-size:11.5px;color:var(--muted);flex-wrap:wrap}
   .lg span{display:inline-flex;align-items:center;gap:6px}.dotc{width:10px;height:10px;border-radius:3px}
-  /* donut */
   .donutwrap{display:flex;align-items:center;gap:18px}
-  .donut{width:150px;height:150px;border-radius:50%;flex:none;position:relative;
-    background:conic-gradient(var(--ok) 0 62%,var(--primary) 62% 82%,var(--oss) 82% 93%,var(--warn) 93% 100%)}
+  .donut{width:150px;height:150px;border-radius:50%;flex:none;position:relative}
   .donut::after{content:"";position:absolute;inset:24px;background:#fff;border-radius:50%}
   .donut .center{position:absolute;inset:0;display:grid;place-content:center;text-align:center;z-index:2}
   .donut .center b{font-size:24px}.donut .center small{font-size:10.5px;color:var(--muted)}
   .dlist{flex:1;font-size:12.5px}
   .dlist .dr{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px dashed var(--line)}
   .dlist .dr:last-child{border:none}.dlist .dr b{margin-left:auto}
-  /* table */
-  .toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
   .fbtn{border:1.5px solid var(--line);background:#fff;color:var(--muted);padding:7px 14px;border-radius:999px;font-size:12.5px;font-weight:700;cursor:pointer}
   .fbtn.on{border-color:var(--primary);color:var(--primary);background:#f3f2ff}
+  .search{flex:1;min-width:160px;position:relative}
+  .search input{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:8px 12px 8px 32px;font-size:13px;font-family:inherit}
+  .search input:focus{outline:none;border-color:var(--primary)}
+  .search::before{content:"🔍";position:absolute;left:11px;top:8px;font-size:12px;opacity:.5}
+  .act{border:none;border-radius:10px;padding:8px 14px;font-size:12.5px;font-weight:800;cursor:pointer}
+  .act.add{background:var(--primary);color:#fff}.act.csv{background:#eafff8;color:#067a63}
   table{width:100%;border-collapse:collapse;font-size:13px}
   thead th{text-align:left;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;padding:9px 10px;border-bottom:2px solid var(--line)}
-  tbody td{padding:11px 10px;border-bottom:1px solid var(--line)}
+  tbody td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
   tbody tr:hover{background:#faf9ff}
   .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px}
   .p-css{background:#eae7ff;color:var(--primary-d)}.p-oss{background:#ffe6ea;color:#c8324a}
-  .p-ok{background:#d8f7e8;color:#0a8f5b}.p-chg{background:#fff2d6;color:#a56a00}
-  .p-cancel{background:#f0f0f5;color:#767a8a}.p-wait{background:#e5efff;color:#2563eb}
   .avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;display:inline-grid;place-items:center;font-size:11px;font-weight:800;margin-right:8px;vertical-align:middle}
   .muted{color:var(--muted);font-size:12px}
+  select.st,input.eng{border:1.5px solid var(--line);border-radius:8px;padding:5px 7px;font-size:12px;font-family:inherit;font-weight:700}
+  select.st:focus,input.eng:focus{outline:none;border-color:var(--primary)}
+  .eng{width:76px}
+  .del{border:none;background:#fff0f2;color:var(--oss);border-radius:8px;padding:5px 9px;font-size:12px;font-weight:800;cursor:pointer}
+  .del:hover{background:var(--oss);color:#fff}
+  .empty{text-align:center;padding:40px 10px;color:var(--muted)}
+  .st-confirmed{color:#0a8f5b}.st-changed{color:#a56a00}.st-canceled{color:#767a8a}.st-novisit{color:#767a8a}.st-noanswer{color:#2563eb}.st-transfer{color:#8b5cf6}.st-done{color:#0a8f5b}
+  /* modal */
+  .mask{position:fixed;inset:0;background:rgba(20,15,50,.45);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
+  .mask.show{display:flex}
+  .modal{background:#fff;border-radius:18px;padding:22px;width:400px;max-width:100%;box-shadow:0 30px 70px rgba(0,0,0,.3)}
+  .modal h3{font-size:17px;margin-bottom:14px}
+  .modal label{display:block;font-size:12px;color:var(--muted);font-weight:700;margin:11px 0 5px}
+  .modal input,.modal select{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13.5px;font-family:inherit}
+  .modal input:focus,.modal select:focus{outline:none;border-color:var(--primary)}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .mrow{display:flex;gap:9px;margin-top:18px}
+  .mrow button{flex:1;border:none;border-radius:11px;padding:11px;font-size:13.5px;font-weight:800;cursor:pointer}
+  .mrow .go{background:var(--primary);color:#fff}.mrow .cx{background:var(--bg);color:var(--muted)}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:#1c1743;color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;opacity:0;transition:.3s;z-index:200;box-shadow:0 12px 30px rgba(0,0,0,.3)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
@@ -86,78 +101,56 @@
   <aside class="side">
     <div class="brand"><div class="lg">📞</div><div><b>OB 콜봇</b><small>Scheduling Agent</small></div></div>
     <nav class="nav">
-      <a class="on" href="#">📊 대시보드</a>
-      <a href="#">📅 출동 스케줄</a>
-      <a href="#">🤖 콜봇 세션</a>
-      <a href="#">👷 기사 배정</a>
-      <a href="#">✉️ 문자/알림</a>
-      <a href="#">⚙️ 설정</a>
+      <a class="on">📊 대시보드</a>
+      <a onclick="location.href='simulator.html'">🤖 콜봇 실행</a>
+      <a onclick="location.href='flow.html'">🔀 Flow 다이어그램</a>
+      <a onclick="location.href='landing.html'">🚀 서비스 소개</a>
     </nav>
     <div class="foot">Swing · PDS · 런처 연동<br><a href="index.html">← 프로젝트 목록</a></div>
   </aside>
 
   <main class="main">
     <div class="hbar">
-      <div><h1>스케줄링 관리 대시보드</h1><p>기사 출동 일정 · 콜봇 처리 현황 실시간 모니터링</p></div>
+      <div><h1>스케줄링 관리 대시보드</h1><p>콜봇 실행 결과가 실시간으로 반영됩니다 (localStorage 연동)</p></div>
       <div class="live"><span class="d"></span>실시간</div>
       <a class="home" href="index.html">목록</a>
     </div>
 
-    <!-- KPIs -->
     <div class="kpis">
-      <div class="card kpi">
-        <div class="top"><div class="ic" style="background:#eae7ff">📞</div><span class="chg up">▲ 12.4%</span></div>
-        <div class="n" id="k1">1,284</div><div class="l">오늘 발신 콜 (PDS)</div>
-      </div>
-      <div class="card kpi">
-        <div class="top"><div class="ic" style="background:#d8f7e8">✅</div><span class="chg up">▲ 8.1%</span></div>
-        <div class="n" id="k2">78.6<span style="font-size:16px">%</span></div><div class="l">콜봇 자동처리율</div>
-      </div>
-      <div class="card kpi">
-        <div class="top"><div class="ic" style="background:#fff2d6">🔄</div><span class="chg down">▼ 21%</span></div>
-        <div class="n" id="k3">63</div><div class="l">일정 변경·취소 건</div>
-      </div>
-      <div class="card kpi">
-        <div class="top"><div class="ic" style="background:#ffe6ea">🚚</div><span class="chg down">▼ 34%</span></div>
-        <div class="n" id="k4">17</div><div class="l">SM 추가 출동</div>
-      </div>
+      <div class="card kpi"><div class="top"><div class="ic" style="background:#eae7ff">📞</div></div><div class="n" id="k1">0</div><div class="l">총 처리 건수</div></div>
+      <div class="card kpi"><div class="top"><div class="ic" style="background:#d8f7e8">✅</div></div><div class="n" id="k2">0<span style="font-size:16px">%</span></div><div class="l">자동 완결율 (확정+변경)</div></div>
+      <div class="card kpi"><div class="top"><div class="ic" style="background:#fff2d6">🔄</div></div><div class="n" id="k3">0</div><div class="l">변경·취소 건</div></div>
+      <div class="card kpi"><div class="top"><div class="ic" style="background:#ffe6ea">🚚</div></div><div class="n" id="k4">0</div><div class="l">미응답→문자 대체</div></div>
     </div>
 
-    <!-- charts -->
     <div class="row2">
       <div class="card">
-        <h3>주간 콜봇 처리 추이</h3><div class="sub">개통(CSS) · 장애(OSS) 일별 처리 건수</div>
+        <h3>영역별 처리 현황</h3><div class="sub">개통(CSS) · 장애(OSS) 결과 유형별 건수</div>
         <div class="bars" id="bars"></div>
-        <div class="lg">
-          <span><span class="dotc" style="background:var(--css)"></span>개통(CSS)</span>
-          <span><span class="dotc" style="background:var(--oss)"></span>장애(OSS)</span>
-        </div>
+        <div class="lg"><span><span class="dotc" style="background:var(--css)"></span>개통(CSS)</span><span><span class="dotc" style="background:var(--oss)"></span>장애(OSS)</span></div>
       </div>
       <div class="card">
-        <h3>처리 결과 분포</h3><div class="sub">오늘 콜봇 세션 결과</div>
+        <h3>처리 결과 분포</h3><div class="sub">전체 세션 결과 비중</div>
         <div class="donutwrap">
-          <div class="donut"><div class="center"><b>78.6%</b><small>자동 완결</small></div></div>
-          <div class="dlist">
-            <div class="dr"><span class="dotc" style="background:var(--ok)"></span>예약·방문 확정<b>62%</b></div>
-            <div class="dr"><span class="dotc" style="background:var(--primary)"></span>일정 변경<b>20%</b></div>
-            <div class="dr"><span class="dotc" style="background:var(--oss)"></span>취소·불필요<b>11%</b></div>
-            <div class="dr"><span class="dotc" style="background:var(--warn)"></span>미응답→문자<b>7%</b></div>
-          </div>
+          <div class="donut" id="donut"><div class="center"><b id="dPct">0%</b><small>자동 완결</small></div></div>
+          <div class="dlist" id="dlist"></div>
         </div>
       </div>
     </div>
 
-    <!-- table -->
     <div class="card">
-      <h3>콜봇 세션 · 출동 스케줄</h3><div class="sub">최근 처리된 방문 일정 (콜봇 자동 연동 결과)</div>
+      <h3>콜봇 세션 · 출동 스케줄</h3><div class="sub">상태·기사 배정을 직접 수정할 수 있습니다</div>
       <div class="toolbar">
         <button class="fbtn on" data-f="all" onclick="filt('all',this)">전체</button>
         <button class="fbtn" data-f="css" onclick="filt('css',this)">개통 CSS</button>
         <button class="fbtn" data-f="oss" onclick="filt('oss',this)">장애 OSS</button>
+        <div class="search"><input id="q" placeholder="고객명·기사·연락처 검색" oninput="render()"></div>
+        <button class="act add" onclick="openAdd()">+ 일정 추가</button>
+        <button class="act csv" onclick="exportCSV()">⬇ CSV</button>
       </div>
       <div style="overflow-x:auto">
       <table>
-        <thead><tr><th>고객</th><th>영역</th><th>방문 일정</th><th>기사</th><th>처리 결과</th><th>채널</th></tr></thead>
+        <thead><tr><th>고객</th><th>영역</th><th>방문 일정</th><th>기사</th><th>상태</th><th>채널</th><th></th></tr></thead>
         <tbody id="tbody"></tbody>
       </table>
       </div>
@@ -165,67 +158,146 @@
   </main>
 </div>
 
-<script>
-/* bar chart data */
-const week=[
-  {d:"월",css:180,oss:70},{d:"화",css:210,oss:85},{d:"수",css:165,oss:60},
-  {d:"목",css:240,oss:95},{d:"금",css:290,oss:120},{d:"토",css:150,oss:55},{d:"일",css:90,oss:40}
-];
-const maxV=Math.max(...week.map(w=>w.css+w.oss));
-const barsEl=document.getElementById('bars');
-week.forEach(w=>{
-  const tot=w.css+w.oss;
-  const col=document.createElement('div');col.className='barcol';
-  const h=Math.round(tot/maxV*150);
-  col.innerHTML=`<div class="v">${tot}</div>
-    <div class="barstack" style="height:0px" data-h="${h}">
-      <div class="seg" style="background:var(--oss);height:${Math.round(w.oss/tot*100)}%"></div>
-      <div class="seg" style="background:var(--css);height:${Math.round(w.css/tot*100)}%"></div>
-    </div><div class="x">${w.d}</div>`;
-  barsEl.appendChild(col);
-});
-setTimeout(()=>document.querySelectorAll('.barstack').forEach(b=>b.style.height=b.dataset.h+'px'),100);
+<!-- add modal -->
+<div class="mask" id="mask"><div class="modal">
+  <h3>새 일정 추가</h3>
+  <div class="two">
+    <div><label>고객명</label><input id="mName" placeholder="홍길동"></div>
+    <div><label>연락처</label><input id="mPhone" placeholder="010-0000-0000"></div>
+  </div>
+  <div class="two">
+    <div><label>영역</label><select id="mArea"><option value="css">개통 (CSS)</option><option value="oss">장애 (OSS)</option></select></div>
+    <div><label>기사</label><input id="mEng" placeholder="김철수"></div>
+  </div>
+  <div class="two">
+    <div><label>방문일</label><input id="mDate" placeholder="7/26(토)"></div>
+    <div><label>시간</label><input id="mTime" placeholder="오전 10~12시"></div>
+  </div>
+  <label>상태</label>
+  <select id="mStatus">
+    <option value="confirmed">예약 확정</option><option value="changed">일정 변경</option>
+    <option value="canceled">취소</option><option value="novisit">방문 불필요</option>
+    <option value="noanswer">미응답→문자</option><option value="done">방문 완료</option>
+  </select>
+  <div class="mrow"><button class="cx" onclick="closeAdd()">취소</button><button class="go" onclick="addRow()">추가</button></div>
+</div></div>
 
-/* table data */
-const rows=[
-  {n:"홍길동",init:"홍",area:"css",sch:"7/25(금) 14–16시",eng:"김철수",res:"ok",resT:"예약 확정",ch:"콜봇+런처"},
-  {n:"이영희",init:"이",area:"css",sch:"7/26(토) 10–12시",eng:"박민수",res:"chg",resT:"일정 변경",ch:"콜봇+런처"},
-  {n:"정우성",init:"정",area:"oss",sch:"7/25(금) 09–11시",eng:"최지훈",res:"ok",resT:"방문 확정",ch:"콜봇"},
-  {n:"강수진",init:"강",area:"oss",sch:"—",eng:"—",res:"cancel",resT:"방문 불필요",ch:"CEI 진단"},
-  {n:"윤도현",init:"윤",area:"css",sch:"7/27(일) 10–12시",eng:"이준호",res:"ok",resT:"예약 확정",ch:"콜봇+런처"},
-  {n:"서지원",init:"서",area:"css",sch:"—",eng:"—",res:"wait",resT:"미응답→문자",ch:"문자 대체"},
-  {n:"한가람",init:"한",area:"oss",sch:"7/26(토) 13–15시",eng:"오세훈",res:"chg",resT:"일정 변경",ch:"콜봇+런처"},
-  {n:"임재현",init:"임",area:"css",sch:"7/28(월) 14–16시",eng:"김철수",res:"ok",resT:"방문 확정",ch:"콜봇"},
-  {n:"조은별",init:"조",area:"oss",sch:"—",eng:"—",res:"cancel",resT:"취소 처리",ch:"콜봇+런처"}
-];
-const resMap={ok:"p-ok",chg:"p-chg",cancel:"p-cancel",wait:"p-wait"};
-const tbody=document.getElementById('tbody');
-function render(f){
-  tbody.innerHTML='';
-  rows.filter(r=>f==='all'||r.area===f).forEach(r=>{
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY='obcb_appts_v1';
+const ST={confirmed:'예약 확정',changed:'일정 변경',canceled:'취소',novisit:'방문 불필요',noanswer:'미응답→문자',transfer:'상담 전환',done:'방문 완료'};
+function uid(){return 'a'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||null}catch(e){return null}}
+function save(a){localStorage.setItem(KEY,JSON.stringify(a));}
+function seed(){
+  const now=Date.now(),D=86400000;
+  const s=[
+    {id:uid(),name:'홍길동',phone:'010-1234-5678',area:'css',date:'7/25(금)',time:'오후 14~16시',engineer:'김철수',status:'confirmed',channel:'콜봇+런처',createdAt:now-2*D},
+    {id:uid(),name:'이영희',phone:'010-2233-4455',area:'css',date:'7/26(토)',time:'오전 10~12시',engineer:'박민수',status:'changed',channel:'콜봇+런처',createdAt:now-2*D},
+    {id:uid(),name:'정우성',phone:'010-3344-5566',area:'oss',date:'7/25(금)',time:'오전 09~11시',engineer:'최지훈',status:'confirmed',channel:'콜봇',createdAt:now-1*D},
+    {id:uid(),name:'강수진',phone:'010-4455-6677',area:'oss',date:'—',time:'—',engineer:'—',status:'novisit',channel:'CEI 진단',createdAt:now-1*D},
+    {id:uid(),name:'윤도현',phone:'010-5566-7788',area:'css',date:'7/27(일)',time:'오전 10~12시',engineer:'이준호',status:'confirmed',channel:'콜봇+런처',createdAt:now-1*D},
+    {id:uid(),name:'서지원',phone:'010-6677-8899',area:'css',date:'—',time:'—',engineer:'—',status:'noanswer',channel:'문자 대체',createdAt:now-1*D},
+    {id:uid(),name:'한가람',phone:'010-7788-9900',area:'oss',date:'7/26(토)',time:'오후 13~15시',engineer:'오세훈',status:'changed',channel:'콜봇+런처',createdAt:now},
+    {id:uid(),name:'임재현',phone:'010-8899-0011',area:'css',date:'7/28(월)',time:'오후 14~16시',engineer:'김철수',status:'done',channel:'콜봇',createdAt:now},
+    {id:uid(),name:'조은별',phone:'010-9900-1122',area:'oss',date:'—',time:'—',engineer:'—',status:'canceled',channel:'콜봇+런처',createdAt:now}
+  ];
+  save(s);return s;
+}
+function all(){let a=load();if(!a){a=seed();}return a;}
+
+let curFilter='all';
+function computeKPI(data){
+  const total=data.length;
+  const auto=data.filter(d=>d.status==='confirmed'||d.status==='changed').length;
+  const chg=data.filter(d=>d.status==='changed'||d.status==='canceled').length;
+  const noans=data.filter(d=>d.status==='noanswer').length;
+  document.getElementById('k1').textContent=total;
+  document.getElementById('k2').firstChild.nodeValue=total?Math.round(auto/total*100):0;
+  document.getElementById('k3').textContent=chg;
+  document.getElementById('k4').textContent=noans;
+}
+function renderCharts(data){
+  // bars: 결과 유형별 css/oss
+  const types=[['confirmed','확정'],['changed','변경'],['canceled','취소'],['novisit','불필요'],['noanswer','미응답']];
+  const barsEl=document.getElementById('bars');barsEl.innerHTML='';
+  const counts=types.map(([k,l])=>({l,css:data.filter(d=>d.area==='css'&&d.status===k).length,oss:data.filter(d=>d.area==='oss'&&d.status===k).length}));
+  const maxV=Math.max(1,...counts.map(c=>c.css+c.oss));
+  counts.forEach(c=>{
+    const tot=c.css+c.oss;const h=Math.round(tot/maxV*150);
+    const col=document.createElement('div');col.className='barcol';
+    col.innerHTML=`<div class="v">${tot||''}</div>
+      <div class="barstack" style="height:0" data-h="${h}">
+        ${c.oss?`<div class="seg" style="background:var(--oss);height:${Math.round(c.oss/tot*100)}%"></div>`:''}
+        ${c.css?`<div class="seg" style="background:var(--css);height:${Math.round(c.css/tot*100)}%"></div>`:''}
+      </div><div class="x">${c.l}</div>`;
+    barsEl.appendChild(col);
+  });
+  setTimeout(()=>document.querySelectorAll('.barstack').forEach(b=>b.style.height=b.dataset.h+'px'),60);
+  // donut
+  const total=data.length||1;
+  const grp=[
+    {k:'확정·완료',c:data.filter(d=>d.status==='confirmed'||d.status==='done').length,col:'var(--ok)'},
+    {k:'일정 변경',c:data.filter(d=>d.status==='changed').length,col:'var(--primary)'},
+    {k:'취소·불필요',c:data.filter(d=>d.status==='canceled'||d.status==='novisit').length,col:'var(--oss)'},
+    {k:'미응답·전환',c:data.filter(d=>d.status==='noanswer'||d.status==='transfer').length,col:'var(--warn)'}
+  ];
+  let acc=0,segs=[];
+  grp.forEach(g=>{const pct=g.c/total*100;segs.push(`${g.col} ${acc}% ${acc+pct}%`);acc+=pct;});
+  document.getElementById('donut').style.background=`conic-gradient(${segs.join(',')})`;
+  const autoPct=Math.round((grp[0].c+grp[1].c)/total*100);
+  document.getElementById('dPct').textContent=autoPct+'%';
+  document.getElementById('dlist').innerHTML=grp.map(g=>`<div class="dr"><span class="dotc" style="background:${g.col}"></span>${g.k}<b>${Math.round(g.c/total*100)}%</b></div>`).join('');
+}
+function render(){
+  const data=all();
+  computeKPI(data);renderCharts(data);
+  const q=(document.getElementById('q').value||'').trim().toLowerCase();
+  const tbody=document.getElementById('tbody');tbody.innerHTML='';
+  const rows=data.filter(r=>(curFilter==='all'||r.area===curFilter))
+    .filter(r=>!q||r.name.toLowerCase().includes(q)||(r.engineer||'').toLowerCase().includes(q)||(r.phone||'').includes(q));
+  if(!rows.length){tbody.innerHTML='<tr><td colspan="7" class="empty">표시할 일정이 없습니다. 콜봇을 실행하거나 “일정 추가”로 등록하세요.</td></tr>';return;}
+  rows.forEach(r=>{
     const tr=document.createElement('tr');
+    const opts=Object.entries(ST).map(([k,v])=>`<option value="${k}" ${r.status===k?'selected':''}>${v}</option>`).join('');
     tr.innerHTML=`
-      <td><span class="avatar">${r.init}</span>${r.n}</td>
+      <td><span class="avatar">${r.name[0]||'?'}</span>${r.name}<div class="muted" style="margin-left:34px">${r.phone||''}</div></td>
       <td><span class="pill ${r.area==='css'?'p-css':'p-oss'}">${r.area==='css'?'개통':'장애'}</span></td>
-      <td>${r.sch}</td>
-      <td class="muted">${r.eng}</td>
-      <td><span class="pill ${resMap[r.res]}">${r.resT}</span></td>
-      <td class="muted">${r.ch}</td>`;
+      <td>${r.date||'—'}<div class="muted">${r.time||''}</div></td>
+      <td><input class="eng" value="${r.engineer||''}" onchange="editRow('${r.id}','engineer',this.value)"></td>
+      <td><select class="st st-${r.status}" onchange="editRow('${r.id}','status',this.value)">${opts}</select></td>
+      <td class="muted">${r.channel||'—'}</td>
+      <td><button class="del" onclick="delRow('${r.id}')">삭제</button></td>`;
     tbody.appendChild(tr);
   });
 }
-function filt(f,el){document.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('on'));el.classList.add('on');render(f);}
-render('all');
-
-/* count-up animation */
-function countUp(id,to,suffix){
-  const el=document.getElementById(id),dur=900,st=performance.now(),isF=to%1!==0;
-  function step(t){let p=Math.min((t-st)/dur,1);let v=to*(1-Math.pow(1-p,3));
-    el.firstChild.nodeValue=(isF?v.toFixed(1):Math.round(v).toLocaleString());
-    if(p<1)requestAnimationFrame(step);}
-  requestAnimationFrame(step);
+function editRow(id,field,val){const a=all();const r=a.find(x=>x.id===id);if(r){r[field]=val;save(a);render();toast('저장되었습니다');}}
+function delRow(id){if(!confirm('이 일정을 삭제할까요?'))return;save(all().filter(x=>x.id!==id));render();toast('삭제되었습니다');}
+function filt(f,el){curFilter=f;document.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('on'));el.classList.add('on');render();}
+function openAdd(){document.getElementById('mask').classList.add('show');}
+function closeAdd(){document.getElementById('mask').classList.remove('show');}
+function addRow(){
+  const g=id=>document.getElementById(id).value.trim();
+  const rec={id:uid(),name:g('mName')||'무명 고객',phone:g('mPhone')||'—',area:document.getElementById('mArea').value,
+    date:g('mDate')||'—',time:g('mTime')||'—',engineer:g('mEng')||'—',status:document.getElementById('mStatus').value,
+    channel:'수기 등록',createdAt:Date.now()};
+  const a=all();a.unshift(rec);save(a);closeAdd();render();toast('일정이 추가되었습니다');
+  ['mName','mPhone','mEng','mDate','mTime'].forEach(i=>document.getElementById(i).value='');
 }
-countUp('k1',1284);countUp('k2',78.6);countUp('k3',63);countUp('k4',17);
+function exportCSV(){
+  const data=all();
+  const head=['고객','연락처','영역','방문일','시간','기사','상태','채널'];
+  const rows=data.map(r=>[r.name,r.phone,r.area==='css'?'개통':'장애',r.date,r.time,r.engineer,ST[r.status]||r.status,r.channel]);
+  const csv='﻿'+[head,...rows].map(r=>r.map(c=>`"${(c||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='ob-callbot-schedule.csv';a.click();toast('CSV를 내보냈습니다');
+}
+let tt;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),1800);}
+document.getElementById('mask').addEventListener('click',e=>{if(e.target.id==='mask')closeAdd();});
+// 다른 탭(시뮬레이터)에서 저장 시 실시간 반영
+window.addEventListener('storage',e=>{if(e.key===KEY)render();});
+render();
 </script>
 </body>
 </html>

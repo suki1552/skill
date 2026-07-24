@@ -3,253 +3,279 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OB 콜봇 Flow 다이어그램</title>
+<title>OB 콜봇 Flow 다이어그램 · 편집기</title>
 <style>
   :root{
     --primary:#5B4FE8;--primary-d:#3D34B0;--accent:#00C9A7;--ink:#1E1B39;--muted:#6B7280;
-    --line:#E6E7F0;--bg:#F6F7FB;--start:#5B4FE8;--proc:#3B82F6;--dec:#F5A524;--end:#12B886;
-    --retry:#F0526B;--io:#8B5CF6;
+    --line:#E6E7F0;--bg:#F6F7FB;--start:#5B4FE8;--proc:#3B82F6;--dec:#F5A524;--end:#12B886;--retry:#F0526B;--io:#8B5CF6;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Malgun Gothic','Apple SD Gothic Neo',system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:26px 16px}
-  .wrap{max-width:1160px;margin:0 auto}
-  header.top{display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+  body{font-family:'Malgun Gothic','Apple SD Gothic Neo',system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:24px 16px}
+  .wrap{max-width:1240px;margin:0 auto}
+  header.top{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
   .logo{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,var(--primary),var(--accent));display:grid;place-items:center;color:#fff;font-size:22px}
   header.top h1{font-size:20px}header.top p{font-size:12.5px;color:var(--muted);margin-top:2px}
-  .home{margin-left:auto;font-size:13px;color:var(--primary);font-weight:700;text-decoration:none;border:1px solid var(--line);padding:8px 14px;border-radius:10px;background:#fff}
-  .tabs{display:flex;gap:9px;margin-bottom:16px;flex-wrap:wrap}
-  .tab{border:1.5px solid var(--line);background:#fff;padding:11px 18px;border-radius:12px;cursor:pointer;font-size:13.5px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:8px}
+  .navlinks{margin-left:auto;display:flex;gap:8px}
+  .navlinks a{font-size:13px;color:var(--primary);font-weight:600;text-decoration:none;border:1px solid var(--line);padding:8px 13px;border-radius:10px;background:#fff}
+  .tabs{display:flex;gap:9px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+  .tab{border:1.5px solid var(--line);background:#fff;padding:10px 16px;border-radius:12px;cursor:pointer;font-size:13.5px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:8px}
   .tab .t{font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:999px}
   .tab .t.css{background:#eae7ff;color:var(--primary-d)}.tab .t.oss{background:#ffe6ea;color:#c8324a}
   .tab.on{border-color:var(--primary);color:var(--primary);background:#f4f2ff}
+  .actbar{margin-left:auto;display:flex;gap:8px}
+  .abtn{border:1.5px solid var(--line);background:#fff;color:var(--ink);padding:9px 14px;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer}
+  .abtn.pri{background:var(--primary);color:#fff;border-color:var(--primary)}
+  .abtn:hover{border-color:var(--primary)}
+
+  .layout{display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start}
+  @media(max-width:960px){.layout{grid-template-columns:1fr}}
   .panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:10px;box-shadow:0 10px 30px rgba(30,27,57,.05)}
   .cap{display:flex;justify-content:space-between;align-items:center;padding:8px 12px 4px;flex-wrap:wrap;gap:10px}
   .cap b{font-size:15px}.cap span{font-size:12px;color:var(--muted)}
-  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted)}
+  .legend{display:flex;gap:13px;flex-wrap:wrap;font-size:11.5px;color:var(--muted)}
   .legend i{width:13px;height:13px;border-radius:4px;display:inline-block;vertical-align:-2px;margin-right:5px}
   .diagram{overflow:auto;padding:6px}
   svg{display:block;min-width:720px;width:100%;height:auto}
-  .node rect,.node polygon,.node .cap-shape{transition:.18s;cursor:pointer}
+  .node rect,.node polygon{transition:.18s;cursor:pointer}
   .node text{font-size:12px;font-weight:700;fill:#fff;pointer-events:none}
-  .node.dim{opacity:.28}
+  .node.dim{opacity:.28}.node.sel rect,.node.sel polygon{stroke:#1E1B39;stroke-width:2.5}
   .node text.dark{fill:var(--ink)}
   .edge{stroke:#c3c6dc;stroke-width:2;fill:none;marker-end:url(#arrow)}
   .edge.hot{stroke:var(--primary);stroke-width:3;marker-end:url(#arrowH)}
-  .elabel{font-size:10.5px;fill:var(--muted);font-weight:700}
-  .elabel.hot{fill:var(--primary)}
-  .hint{text-align:center;font-size:12px;color:var(--muted);padding:10px}
+  .elabel{font-size:10.5px;fill:var(--muted);font-weight:700}.elabel.hot{fill:var(--primary)}
+  .noteb{fill:var(--accent);stroke:#fff;stroke-width:2}
+  .hint{text-align:center;font-size:12px;color:var(--muted);padding:8px}
+
+  /* inspector */
+  .insp h3{font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:4px 4px 12px}
+  .insp .empty{color:var(--muted);font-size:13px;text-align:center;padding:30px 12px;line-height:1.6}
+  .insp .nt{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;color:#fff;margin-bottom:12px}
+  .insp label{display:block;font-size:11.5px;color:var(--muted);font-weight:700;margin:12px 4px 5px}
+  .insp input,.insp textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:9px 11px;font-size:13px;font-family:inherit}
+  .insp input:focus,.insp textarea:focus{outline:none;border-color:var(--primary)}
+  .insp textarea{min-height:88px;resize:vertical;line-height:1.5}
+  .insp .btns{display:flex;gap:8px;margin-top:14px}
+  .insp .btns button{flex:1;border:none;border-radius:10px;padding:10px;font-size:12.5px;font-weight:800;cursor:pointer}
+  .insp .btns .save{background:var(--primary);color:#fff}.insp .btns .clr{background:#fff0f2;color:var(--retry)}
+  .conns{margin-top:16px;font-size:12px;color:var(--muted)}
+  .conns .c{padding:6px 0;border-top:1px dashed var(--line)}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:#1c1743;color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;opacity:0;transition:.3s;z-index:200}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="top">
     <div class="logo">🔀</div>
-    <div><h1>OB 콜봇 Flow 다이어그램</h1><p>콜봇 대화 흐름 시각화 · 노드를 클릭하면 연결된 경로가 강조됩니다</p></div>
-    <a class="home" href="index.html">← 목록</a>
+    <div><h1>OB 콜봇 Flow 편집기</h1><p>노드를 클릭해 라벨·업무 메모를 편집하고, 다이어그램을 SVG로 내보내세요</p></div>
+    <div class="navlinks"><a href="index.html">목록</a><a href="dashboard.html">📊 대시보드</a></div>
   </header>
 
   <div class="tabs">
-    <button class="tab on" onclick="draw('book',this)"><span class="t css">개통</span>방문일정 예약</button>
-    <button class="tab" onclick="draw('d1',this)"><span class="t css">개통</span>D-1 방문일정</button>
-    <button class="tab" onclick="draw('oss',this)"><span class="t oss">장애</span>D-1 방문일정</button>
+    <button class="tab on" onclick="setFlow('book',this)"><span class="t css">개통</span>방문일정 예약</button>
+    <button class="tab" onclick="setFlow('d1',this)"><span class="t css">개통</span>D-1 방문일정</button>
+    <button class="tab" onclick="setFlow('oss',this)"><span class="t oss">장애</span>D-1 방문일정</button>
+    <div class="actbar">
+      <button class="abtn" onclick="resetNotes()">메모 초기화</button>
+      <button class="abtn pri" onclick="exportSVG()">⬇ SVG 내보내기</button>
+    </div>
   </div>
 
-  <div class="panel">
-    <div class="cap">
-      <div><b id="capT">개통 · 방문일정 예약 Flow</b> &nbsp;<span id="capS">디지털스케줄링 PoC를 통한 일정 예약</span></div>
-      <div class="legend">
-        <span><i style="background:var(--start)"></i>시작/발신</span>
-        <span><i style="background:var(--proc)"></i>처리</span>
-        <span><i style="background:var(--dec);"></i>분기(판단)</span>
-        <span><i style="background:var(--end)"></i>종료</span>
-        <span><i style="background:var(--retry)"></i>재시도</span>
+  <div class="layout">
+    <div class="panel">
+      <div class="cap">
+        <div><b id="capT">개통 · 방문일정 예약 Flow</b> &nbsp;<span id="capS"></span></div>
+        <div class="legend">
+          <span><i style="background:var(--start)"></i>시작</span>
+          <span><i style="background:var(--proc)"></i>처리</span>
+          <span><i style="background:var(--dec)"></i>분기</span>
+          <span><i style="background:var(--end)"></i>종료</span>
+          <span><i style="background:var(--retry)"></i>재시도</span>
+          <span><i style="background:var(--accent)"></i>메모 있음</span>
+        </div>
+      </div>
+      <div class="diagram"><svg id="svg" viewBox="0 0 940 560" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#c3c6dc"/></marker>
+          <marker id="arrowH" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#5B4FE8"/></marker>
+        </defs>
+        <g id="edges"></g><g id="nodes"></g>
+      </svg></div>
+      <div class="hint" id="hint">💡 노드를 클릭하면 경로가 강조되고, 오른쪽에서 라벨·메모를 편집할 수 있습니다</div>
+    </div>
+
+    <div class="panel insp" id="insp">
+      <h3>노드 편집</h3>
+      <div class="empty" id="inspEmpty">노드를 선택하세요.<br>선택한 단계의 라벨을 수정하거나<br>업무 메모(담당·SLA·유의사항 등)를<br>추가할 수 있습니다.</div>
+      <div id="inspBody" style="display:none">
+        <span class="nt" id="inspType"></span>
+        <label>단계 라벨</label>
+        <input id="inspLabel" placeholder="노드 라벨">
+        <label>업무 메모</label>
+        <textarea id="inspNote" placeholder="예) 본인확인 실패 시 상담사 연결 · 응답 대기 30초 · 개인정보 3종 대조"></textarea>
+        <div class="btns"><button class="save" onclick="saveNode()">저장</button><button class="clr" onclick="clearNode()">메모 삭제</button></div>
+        <div class="conns" id="inspConns"></div>
       </div>
     </div>
-    <div class="diagram"><svg id="svg" viewBox="0 0 940 560" preserveAspectRatio="xMidYMin meet">
-      <defs>
-        <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#c3c6dc"/></marker>
-        <marker id="arrowH" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#5B4FE8"/></marker>
-      </defs>
-      <g id="edges"></g><g id="nodes"></g>
-    </svg></div>
-    <div class="hint" id="hint">💡 노드를 클릭해 경로를 강조하고, 다시 클릭하면 해제됩니다</div>
   </div>
 </div>
+<div class="toast" id="toast"></div>
 
 <script>
 const C={start:'#5B4FE8',proc:'#3B82F6',dec:'#F5A524',end:'#12B886',retry:'#F0526B',io:'#8B5CF6'};
-/* 각 노드: id,x,y,type,label(줄바꿈 \n). 좌표는 중심 기준. */
+const TYPE_LABEL={start:'시작/발신',proc:'처리',dec:'분기(판단)',end:'종료',retry:'재시도',io:'입력'};
+const NOTES_KEY='obcb_flow_notes_v1';
+function loadNotes(){try{return JSON.parse(localStorage.getItem(NOTES_KEY))||{}}catch(e){return{}}}
+function saveNotes(o){localStorage.setItem(NOTES_KEY,JSON.stringify(o));}
+
 const FLOWS={
   book:{title:"개통 · 방문일정 예약 Flow",sub:"디지털스케줄링 PoC를 통한 일정 예약",
     nodes:[
-      {id:'s',x:120,y:50,type:'start',label:'시작 (발신)'},
-      {id:'l',x:120,y:150,type:'dec',label:'런처\n솔루션'},
-      {id:'sms',x:330,y:150,type:'proc',label:'런처 無 :\n문자 발송'},
-      {id:'e1',x:540,y:150,type:'end',label:'종료'},
-      {id:'g',x:120,y:260,type:'proc',label:'인사 및\n목적 안내'},
-      {id:'auth',x:120,y:360,type:'proc',label:'본인 확인'},
-      {id:'cal',x:120,y:460,type:'io',label:'일정 예약\n(달력)'},
-      {id:'sug',x:330,y:460,type:'io',label:'일정 예약\n(제안)'},
-      {id:'e2',x:540,y:460,type:'end',label:'종료'},
-      {id:'noans',x:760,y:260,type:'dec',label:'미응답'},
-      {id:'retry',x:760,y:360,type:'retry',label:'재시도 +\n문자발송'},
-      {id:'e3',x:760,y:460,type:'end',label:'종료'}
+      {id:'s',x:120,y:50,type:'start',label:'시작 (발신)'},{id:'l',x:120,y:150,type:'dec',label:'런처\n솔루션'},
+      {id:'sms',x:330,y:150,type:'proc',label:'런처 無 :\n문자 발송'},{id:'e1',x:540,y:150,type:'end',label:'종료'},
+      {id:'g',x:120,y:260,type:'proc',label:'인사 및\n목적 안내'},{id:'auth',x:120,y:360,type:'proc',label:'본인 확인'},
+      {id:'cal',x:120,y:460,type:'io',label:'일정 예약\n(달력)'},{id:'sug',x:330,y:460,type:'io',label:'일정 예약\n(제안)'},
+      {id:'e2',x:540,y:460,type:'end',label:'종료'},{id:'noans',x:760,y:260,type:'dec',label:'미응답'},
+      {id:'retry',x:760,y:360,type:'retry',label:'재시도 +\n문자발송'},{id:'e3',x:760,y:460,type:'end',label:'종료'}
     ],
-    edges:[
-      {f:'s',t:'l'},{f:'l',t:'sms',l:'런처 無'},{f:'sms',t:'e1'},
-      {f:'l',t:'g',l:'런처 有'},{f:'g',t:'auth'},{f:'auth',t:'cal'},
-      {f:'cal',t:'sug'},{f:'sug',t:'e2'},{f:'cal',t:'e2',curve:1},
-      {f:'g',t:'noans',l:'미응답',dash:1},{f:'noans',t:'retry'},{f:'retry',t:'e3'}
-    ]},
+    edges:[{f:'s',t:'l'},{f:'l',t:'sms',l:'런처 無'},{f:'sms',t:'e1'},{f:'l',t:'g',l:'런처 有'},{f:'g',t:'auth'},{f:'auth',t:'cal'},{f:'cal',t:'sug'},{f:'sug',t:'e2'},{f:'cal',t:'e2',curve:1},{f:'g',t:'noans',l:'미응답',dash:1},{f:'noans',t:'retry'},{f:'retry',t:'e3'}]},
   d1:{title:"개통 · D-1 방문일정 Flow",sub:"디지털스케줄링 PoC를 통한 일정 확정 / 변경 / 취소",
     nodes:[
-      {id:'s',x:120,y:50,type:'start',label:'시작 (발신)'},
-      {id:'l',x:120,y:150,type:'dec',label:'런처\n솔루션'},
-      {id:'sms',x:330,y:100,type:'proc',label:'런처 無 :\n문자 발송'},
-      {id:'refl',x:540,y:100,type:'proc',label:'스케줄 반영'},
-      {id:'e0',x:750,y:100,type:'end',label:'종료'},
-      {id:'g',x:120,y:250,type:'proc',label:'인사 및\n일정 안내'},
-      {id:'auth',x:120,y:350,type:'proc',label:'본인 확인'},
-      {id:'info',x:120,y:450,type:'proc',label:'방문 일정\n안내'},
-      {id:'dec',x:330,y:450,type:'dec',label:'방문 일정\n변경 여부'},
-      {id:'fix',x:540,y:360,type:'proc',label:'일정 확정'},
-      {id:'re',x:540,y:250,type:'proc',label:'스케줄\n재조정'},
-      {id:'e1',x:750,y:300,type:'end',label:'종료'},
-      {id:'cancel',x:540,y:470,type:'retry',label:'취소 처리'},
-      {id:'e2',x:750,y:470,type:'end',label:'종료'},
-      {id:'noans',x:120,y:540,type:'dec',label:'미응답'},
-      {id:'retry',x:330,y:540,type:'retry',label:'재시도 +\n문자발송'}
+      {id:'s',x:120,y:50,type:'start',label:'시작 (발신)'},{id:'l',x:120,y:150,type:'dec',label:'런처\n솔루션'},
+      {id:'sms',x:330,y:100,type:'proc',label:'런처 無 :\n문자 발송'},{id:'refl',x:540,y:100,type:'proc',label:'스케줄 반영'},{id:'e0',x:750,y:100,type:'end',label:'종료'},
+      {id:'g',x:120,y:250,type:'proc',label:'인사 및\n일정 안내'},{id:'auth',x:120,y:350,type:'proc',label:'본인 확인'},{id:'info',x:120,y:450,type:'proc',label:'방문 일정\n안내'},
+      {id:'dec',x:330,y:450,type:'dec',label:'방문 일정\n변경 여부'},{id:'fix',x:540,y:360,type:'proc',label:'일정 확정'},{id:'re',x:540,y:250,type:'proc',label:'스케줄\n재조정'},
+      {id:'e1',x:750,y:300,type:'end',label:'종료'},{id:'cancel',x:540,y:470,type:'retry',label:'취소 처리'},{id:'e2',x:750,y:470,type:'end',label:'종료'},
+      {id:'noans',x:120,y:540,type:'dec',label:'미응답'},{id:'retry',x:330,y:540,type:'retry',label:'재시도 +\n문자발송'}
     ],
-    edges:[
-      {f:'s',t:'l'},{f:'l',t:'sms',l:'런처 無'},{f:'sms',t:'refl'},{f:'refl',t:'e0'},
-      {f:'l',t:'g',l:'런처 有'},{f:'g',t:'auth'},{f:'auth',t:'info'},{f:'info',t:'dec'},
-      {f:'dec',t:'fix',l:'확정'},{f:'fix',t:'e1'},
-      {f:'dec',t:'re',l:'변경 요청'},{f:'re',t:'e1'},
-      {f:'dec',t:'cancel',l:'취소 요청'},{f:'cancel',t:'e2'},
-      {f:'g',t:'noans',l:'미응답',dash:1},{f:'noans',t:'retry'}
-    ]},
+    edges:[{f:'s',t:'l'},{f:'l',t:'sms',l:'런처 無'},{f:'sms',t:'refl'},{f:'refl',t:'e0'},{f:'l',t:'g',l:'런처 有'},{f:'g',t:'auth'},{f:'auth',t:'info'},{f:'info',t:'dec'},{f:'dec',t:'fix',l:'확정'},{f:'fix',t:'e1'},{f:'dec',t:'re',l:'변경 요청'},{f:'re',t:'e1'},{f:'dec',t:'cancel',l:'취소 요청'},{f:'cancel',t:'e2'},{f:'g',t:'noans',l:'미응답',dash:1},{f:'noans',t:'retry'}]},
   oss:{title:"장애 · D-1 방문일정 Flow",sub:"CEI 진단 결과에 따른 디지털AS 일정 안내 / 변경 / 취소",
     nodes:[
-      {id:'s',x:120,y:50,type:'start',label:'시작 (발신)'},
-      {id:'l',x:120,y:150,type:'dec',label:'런처\n솔루션'},
-      {id:'sms',x:330,y:100,type:'proc',label:'런처 無 :\n문자 발송'},
-      {id:'e0',x:540,y:100,type:'end',label:'종료'},
-      {id:'cei',x:120,y:250,type:'dec',label:'CEI 진단\n결과'},
-      {id:'norm',x:330,y:200,type:'proc',label:'정상 상태\n방문 불필요'},
-      {id:'cancel0',x:540,y:200,type:'retry',label:'취소 처리'},
-      {id:'e1',x:750,y:200,type:'end',label:'종료'},
-      {id:'g',x:120,y:350,type:'proc',label:'인사 및\n일정 안내'},
-      {id:'auth',x:120,y:450,type:'proc',label:'본인 확인'},
-      {id:'info',x:120,y:540,type:'proc',label:'방문 일정\n안내'},
-      {id:'dec',x:330,y:490,type:'dec',label:'방문 일정\n변경 여부'},
-      {id:'re',x:540,y:410,type:'proc',label:'스케줄\n재조정'},
-      {id:'fix',x:540,y:490,type:'proc',label:'확정'},
-      {id:'e2',x:750,y:450,type:'end',label:'종료'},
-      {id:'cancel',x:540,y:560,type:'retry',label:'취소 처리'},
-      {id:'e3',x:750,y:560,type:'end',label:'종료'}
+      {id:'s',x:120,y:50,type:'start',label:'시작 (발신)'},{id:'l',x:120,y:150,type:'dec',label:'런처\n솔루션'},
+      {id:'sms',x:330,y:100,type:'proc',label:'런처 無 :\n문자 발송'},{id:'e0',x:540,y:100,type:'end',label:'종료'},
+      {id:'cei',x:120,y:250,type:'dec',label:'CEI 진단\n결과'},{id:'norm',x:330,y:200,type:'proc',label:'정상 상태\n방문 불필요'},{id:'cancel0',x:540,y:200,type:'retry',label:'취소 처리'},{id:'e1',x:750,y:200,type:'end',label:'종료'},
+      {id:'g',x:120,y:350,type:'proc',label:'인사 및\n일정 안내'},{id:'auth',x:120,y:450,type:'proc',label:'본인 확인'},{id:'info',x:120,y:540,type:'proc',label:'방문 일정\n안내'},
+      {id:'dec',x:330,y:490,type:'dec',label:'방문 일정\n변경 여부'},{id:'re',x:540,y:410,type:'proc',label:'스케줄\n재조정'},{id:'fix',x:540,y:490,type:'proc',label:'확정'},{id:'e2',x:750,y:450,type:'end',label:'종료'},
+      {id:'cancel',x:540,y:560,type:'retry',label:'취소 처리'},{id:'e3',x:750,y:560,type:'end',label:'종료'}
     ],
-    edges:[
-      {f:'s',t:'l'},{f:'l',t:'sms',l:'런처 無'},{f:'sms',t:'e0'},
-      {f:'l',t:'cei',l:'런처 有'},
-      {f:'cei',t:'norm',l:'방문 불필요'},{f:'norm',t:'cancel0'},{f:'cancel0',t:'e1'},
-      {f:'cei',t:'g',l:'방문 필요'},{f:'g',t:'auth'},{f:'auth',t:'info'},{f:'info',t:'dec'},
-      {f:'dec',t:'re',l:'변경'},{f:'re',t:'e2'},
-      {f:'dec',t:'fix',l:'확정'},{f:'fix',t:'e2'},
-      {f:'dec',t:'cancel',l:'취소'},{f:'cancel',t:'e3'}
-    ]}
+    edges:[{f:'s',t:'l'},{f:'l',t:'sms',l:'런처 無'},{f:'sms',t:'e0'},{f:'l',t:'cei',l:'런처 有'},{f:'cei',t:'norm',l:'방문 불필요'},{f:'norm',t:'cancel0'},{f:'cancel0',t:'e1'},{f:'cei',t:'g',l:'방문 필요'},{f:'g',t:'auth'},{f:'auth',t:'info'},{f:'info',t:'dec'},{f:'dec',t:'re',l:'변경'},{f:'re',t:'e2'},{f:'dec',t:'fix',l:'확정'},{f:'fix',t:'e2'},{f:'dec',t:'cancel',l:'취소'},{f:'cancel',t:'e3'}]}
 };
 
-const NW=118,NH=52; // node box size (process)
-let active=null, curFlow='book';
+const NW=118,NH=52;
+let curFlow='book', sel=null;
 const nodesG=document.getElementById('nodes'), edgesG=document.getElementById('edges');
+const SVGNS='http://www.w3.org/2000/svg';
 
-function nodeAnchor(n){return {x:n.x,y:n.y};}
-function makeText(label,cx,cy,dark){
+function effLabel(id){const n=loadNotes();return (n[curFlow]&&n[curFlow][id]&&n[curFlow][id].label)||FLOWS[curFlow].nodes.find(x=>x.id===id).label;}
+function noteOf(id){const n=loadNotes();return (n[curFlow]&&n[curFlow][id])||{};}
+function hasNote(id){const nt=noteOf(id);return !!(nt.note&&nt.note.trim());}
+
+function mkText(label,cx,cy){
   const lines=label.split('\n');
-  let t=`<text x="${cx}" y="${cy - (lines.length-1)*7}" text-anchor="middle" class="${dark?'dark':''}">`;
-  lines.forEach((ln,i)=>{ t+=`<tspan x="${cx}" dy="${i?14:0}">${ln}</tspan>`; });
+  let t=`<text x="${cx}" y="${cy-(lines.length-1)*7}" text-anchor="middle">`;
+  lines.forEach((ln,i)=>{t+=`<tspan x="${cx}" dy="${i?14:0}">${ln}</tspan>`;});
   return t+`</text>`;
 }
-function draw(key,tabEl){
+function setFlow(key,tabEl){
   if(tabEl){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));tabEl.classList.add('on');}
-  curFlow=key; active=null;
-  const F=FLOWS[key];
+  curFlow=key;sel=null;draw();closeInsp();
+}
+function draw(){
+  const F=FLOWS[curFlow];
   document.getElementById('capT').textContent=F.title;
   document.getElementById('capS').textContent=F.sub;
-  // viewBox height from max y
   const maxY=Math.max(...F.nodes.map(n=>n.y))+70;
   document.getElementById('svg').setAttribute('viewBox',`0 0 940 ${maxY}`);
-  const byId={}; F.nodes.forEach(n=>byId[n.id]=n);
-  // edges
-  edgesG.innerHTML=''; nodesG.innerHTML='';
+  const byId={};F.nodes.forEach(n=>byId[n.id]=n);
+  edgesG.innerHTML='';nodesG.innerHTML='';
   F.edges.forEach((e,i)=>{
-    const a=byId[e.f],b=byId[e.t];
-    const p=edgePath(a,b,e.curve);
-    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
-    path.setAttribute('d',p.d);path.setAttribute('class','edge'+(e.dash?'':''));
+    const a=byId[e.f],b=byId[e.t],p=edgePath(a,b,e.curve);
+    const path=document.createElementNS(SVGNS,'path');
+    path.setAttribute('d',p.d);path.setAttribute('class','edge');
     if(e.dash)path.setAttribute('stroke-dasharray','5 4');
-    path.dataset.f=e.f;path.dataset.t=e.t;path.dataset.idx=i;
-    edgesG.appendChild(path);
-    if(e.l){
-      const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
-      tx.setAttribute('x',p.lx);tx.setAttribute('y',p.ly);tx.setAttribute('class','elabel');tx.setAttribute('text-anchor','middle');
-      tx.textContent=e.l;tx.dataset.idx=i;edgesG.appendChild(tx);
-    }
+    path.dataset.f=e.f;path.dataset.t=e.t;path.dataset.idx=i;edgesG.appendChild(path);
+    if(e.l){const tx=document.createElementNS(SVGNS,'text');tx.setAttribute('x',p.lx);tx.setAttribute('y',p.ly);tx.setAttribute('class','elabel');tx.setAttribute('text-anchor','middle');tx.textContent=e.l;tx.dataset.idx=i;edgesG.appendChild(tx);}
   });
-  // nodes
   F.nodes.forEach(n=>{
-    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
-    g.setAttribute('class','node');g.dataset.id=n.id;
-    const col=C[n.type];
-    if(n.type==='dec'){
-      const w=64;
-      g.innerHTML=`<polygon points="${n.x},${n.y-w} ${n.x+w+18},${n.y} ${n.x},${n.y+w} ${n.x-w-18},${n.y}" fill="${col}"/>`+makeText(n.label,n.x,n.y);
-    }else if(n.type==='start'||n.type==='end'){
-      g.innerHTML=`<rect x="${n.x-58}" y="${n.y-24}" width="116" height="48" rx="24" fill="${col}"/>`+makeText(n.label,n.x,n.y);
-    }else{
-      g.innerHTML=`<rect x="${n.x-NW/2}" y="${n.y-NH/2}" width="${NW}" height="${NH}" rx="12" fill="${col}"/>`+makeText(n.label,n.x,n.y);
-    }
-    g.addEventListener('click',()=>toggle(n.id));
+    const g=document.createElementNS(SVGNS,'g');g.setAttribute('class','node'+(sel===n.id?' sel':''));g.dataset.id=n.id;
+    const col=C[n.type],label=effLabel(n.id);
+    if(n.type==='dec'){const w=64;g.innerHTML=`<polygon points="${n.x},${n.y-w} ${n.x+w+18},${n.y} ${n.x},${n.y+w} ${n.x-w-18},${n.y}" fill="${col}"/>`+mkText(label,n.x,n.y);}
+    else if(n.type==='start'||n.type==='end'){g.innerHTML=`<rect x="${n.x-58}" y="${n.y-24}" width="116" height="48" rx="24" fill="${col}"/>`+mkText(label,n.x,n.y);}
+    else{g.innerHTML=`<rect x="${n.x-NW/2}" y="${n.y-NH/2}" width="${NW}" height="${NH}" rx="12" fill="${col}"/>`+mkText(label,n.x,n.y);}
+    if(hasNote(n.id)){const bx=n.type==='dec'?n.x+70:n.x+NW/2-6;const by=n.type==='dec'?n.y-6:n.y-NH/2;g.innerHTML+=`<circle class="noteb" cx="${bx}" cy="${by}" r="7"/><text x="${bx}" y="${by+3}" text-anchor="middle" style="font-size:9px;fill:#053">✎</text>`;}
+    g.addEventListener('click',()=>selectNode(n.id));
     nodesG.appendChild(g);
   });
 }
 function edgePath(a,b,curve){
-  let x1=a.x,y1=a.y,x2=b.x,y2=b.y;
-  // trim to box edges roughly
-  const dx=x2-x1,dy=y2-y1;
-  // start offset
-  if(Math.abs(dy)>Math.abs(dx)){ y1+=dy>0?28:-28; y2+=dy>0?-30:30; }
-  else { x1+=dx>0?60:-60; x2+=dx>0?-64:64; }
+  let x1=a.x,y1=a.y,x2=b.x,y2=b.y;const dx=x2-x1,dy=y2-y1;
+  if(Math.abs(dy)>Math.abs(dx)){y1+=dy>0?28:-28;y2+=dy>0?-30:30;}else{x1+=dx>0?60:-60;x2+=dx>0?-64:64;}
   let d,lx=(x1+x2)/2,ly=(y1+y2)/2-6;
-  if(curve){ const mx=x1-70; d=`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`; lx=mx; ly=(y1+y2)/2; }
-  else if(Math.abs(dx)>4&&Math.abs(dy)>4){ d=`M${x1},${y1} L${x1},${(y1+y2)/2} L${x2},${(y1+y2)/2} L${x2},${y2}`; lx=(x1+x2)/2; ly=(y1+y2)/2-6;}
+  if(curve){const mx=x1-70;d=`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`;lx=mx;ly=(y1+y2)/2;}
+  else if(Math.abs(dx)>4&&Math.abs(dy)>4){d=`M${x1},${y1} L${x1},${(y1+y2)/2} L${x2},${(y1+y2)/2} L${x2},${y2}`;}
   else d=`M${x1},${y1} L${x2},${y2}`;
   return {d,lx,ly};
 }
-function toggle(id){
-  active = (active===id)?null:id;
+function selectNode(id){
+  sel=id;
   const F=FLOWS[curFlow];
-  // find connected edges (out + in)
   const connected=new Set();
-  if(active){
-    F.edges.forEach((e,i)=>{ if(e.f===active||e.t===active){connected.add(i); connected.add('n:'+e.f);connected.add('n:'+e.t);} });
-    connected.add('n:'+active);
-  }
-  document.querySelectorAll('.node').forEach(g=>{
-    g.classList.toggle('dim', active && !connected.has('n:'+g.dataset.id));
-  });
-  document.querySelectorAll('.edge').forEach(p=>{
-    const hot=active && connected.has(+p.dataset.idx);
-    p.classList.toggle('hot',hot);
-  });
-  document.querySelectorAll('.elabel').forEach(t=>{
-    t.classList.toggle('hot', active && connected.has(+t.dataset.idx));
-  });
-  document.getElementById('hint').textContent = active
-    ? '🔦 "'+F.nodes.find(n=>n.id===active).label.replace(/\n/g,' ')+'" 노드와 연결된 경로를 강조 중 · 다시 클릭하면 해제'
-    : '💡 노드를 클릭해 경로를 강조하고, 다시 클릭하면 해제됩니다';
+  F.edges.forEach((e,i)=>{if(e.f===id||e.t===id){connected.add(i);connected.add('n:'+e.f);connected.add('n:'+e.t);}});
+  connected.add('n:'+id);
+  document.querySelectorAll('.node').forEach(g=>{g.classList.toggle('dim',!connected.has('n:'+g.dataset.id));g.classList.toggle('sel',g.dataset.id===id);});
+  document.querySelectorAll('.edge').forEach(p=>p.classList.toggle('hot',connected.has(+p.dataset.idx)));
+  document.querySelectorAll('.elabel').forEach(t=>t.classList.toggle('hot',connected.has(+t.dataset.idx)));
+  openInsp(id);
 }
-draw('book',document.querySelector('.tab'));
+function openInsp(id){
+  const node=FLOWS[curFlow].nodes.find(n=>n.id===id);
+  document.getElementById('inspEmpty').style.display='none';
+  document.getElementById('inspBody').style.display='block';
+  const tp=document.getElementById('inspType');tp.textContent=TYPE_LABEL[node.type];tp.style.background=C[node.type];
+  document.getElementById('inspLabel').value=effLabel(id);
+  document.getElementById('inspNote').value=noteOf(id).note||'';
+  // connections
+  const F=FLOWS[curFlow];const outs=F.edges.filter(e=>e.f===id),ins=F.edges.filter(e=>e.t===id);
+  const nm=x=>effLabel(x).replace(/\n/g,' ');
+  let h='';
+  if(ins.length)h+='<div class="c"><b>← 이전</b> '+ins.map(e=>nm(e.f)).join(', ')+'</div>';
+  if(outs.length)h+='<div class="c"><b>다음 →</b> '+outs.map(e=>nm(e.t)+(e.l?' ('+e.l+')':'')).join(', ')+'</div>';
+  document.getElementById('inspConns').innerHTML=h;
+}
+function closeInsp(){document.getElementById('inspEmpty').style.display='block';document.getElementById('inspBody').style.display='none';}
+function saveNode(){
+  if(!sel)return;
+  const notes=loadNotes();notes[curFlow]=notes[curFlow]||{};
+  const label=document.getElementById('inspLabel').value.trim();
+  const note=document.getElementById('inspNote').value.trim();
+  const orig=FLOWS[curFlow].nodes.find(n=>n.id===sel).label;
+  notes[curFlow][sel]={label:(label&&label!==orig)?label:undefined,note:note||undefined};
+  if(!notes[curFlow][sel].label&&!notes[curFlow][sel].note)delete notes[curFlow][sel];
+  saveNotes(notes);draw();selectNode(sel);toast('저장되었습니다');
+}
+function clearNode(){
+  if(!sel)return;const notes=loadNotes();if(notes[curFlow])delete notes[curFlow][sel];saveNotes(notes);
+  draw();selectNode(sel);toast('메모를 삭제했습니다');
+}
+function resetNotes(){
+  if(!confirm('현재 Flow의 모든 라벨·메모 편집을 초기화할까요?'))return;
+  const notes=loadNotes();delete notes[curFlow];saveNotes(notes);sel=null;draw();closeInsp();toast('초기화되었습니다');
+}
+function exportSVG(){
+  const svg=document.getElementById('svg').cloneNode(true);
+  svg.setAttribute('xmlns',SVGNS);
+  // inline minimal styles for standalone svg
+  const style=document.createElementNS(SVGNS,'style');
+  style.textContent='.node text{font-family:sans-serif;font-size:12px;font-weight:700;fill:#fff}.edge{stroke:#c3c6dc;stroke-width:2;fill:none}.elabel{font-family:sans-serif;font-size:10.5px;fill:#6B7280;font-weight:700}';
+  svg.insertBefore(style,svg.firstChild);
+  svg.querySelectorAll('.node.dim').forEach(n=>n.classList.remove('dim'));
+  svg.querySelectorAll('path.edge').forEach(p=>{p.setAttribute('marker-end','url(#arrow)');});
+  const data='<?xml version="1.0" encoding="UTF-8"?>\n'+new XMLSerializer().serializeToString(svg);
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'image/svg+xml'}));
+  a.download='ob-callbot-flow-'+curFlow+'.svg';a.click();toast('SVG를 내보냈습니다');
+}
+let tt;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),1700);}
+draw();
 </script>
 </body>
 </html>
