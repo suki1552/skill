@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OB 콜봇 구축 프로젝트 — 출동 최적화 스케줄링 Agent</title>
+<style>
+  :root{
+    --primary:#5B4FE8;--primary-d:#3D34B0;--accent:#00C9A7;--ink:#14122B;--muted:#6B7280;
+    --line:#E9EAF2;--bg:#F6F7FB;--css:#5B4FE8;--oss:#F0526B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Malgun Gothic','Apple SD Gothic Neo',system-ui,sans-serif;color:var(--ink);background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .container{max-width:1080px;margin:0 auto;padding:0 22px}
+  /* nav */
+  nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  nav .inner{display:flex;align-items:center;gap:12px;height:62px}
+  nav .lg{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--accent));display:grid;place-items:center;color:#fff;font-size:17px}
+  nav b{font-size:15px}nav .links{margin-left:auto;display:flex;gap:22px;font-size:13.5px;color:var(--muted)}
+  nav .links a:hover{color:var(--primary)}
+  @media(max-width:720px){nav .links{display:none}}
+  .btn{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;padding:9px 18px;border-radius:10px;font-weight:700;font-size:13.5px}
+  /* hero */
+  .hero{background:radial-gradient(900px 500px at 15% -10%,#efeaff 0,transparent 60%),
+    radial-gradient(700px 400px at 100% 0,#d7fff4 0,transparent 55%);padding:76px 0 60px;overflow:hidden}
+  .hero .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+  @media(max-width:860px){.hero .grid{grid-template-columns:1fr}}
+  .badge{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);padding:7px 14px;border-radius:999px;font-size:12.5px;font-weight:700;color:var(--primary-d);margin-bottom:20px}
+  .badge .d{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+  .hero h1{font-size:44px;line-height:1.18;letter-spacing:-1.2px}
+  .hero h1 .hl{background:linear-gradient(120deg,var(--primary),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.lead{font-size:16.5px;color:var(--muted);margin:20px 0 28px;line-height:1.65;max-width:520px}
+  .cta{display:flex;gap:12px;flex-wrap:wrap}
+  .cta .ghost{background:#fff;border:1.5px solid var(--line);color:var(--ink);padding:12px 22px;border-radius:12px;font-weight:700;font-size:14px}
+  .cta .prime{padding:12px 24px;border-radius:12px;font-size:14px}
+  /* phone mock in hero */
+  .mock{justify-self:center;width:290px;background:#0e0b24;border-radius:34px;padding:11px;box-shadow:0 34px 70px rgba(30,20,80,.35);position:relative}
+  .mock .scr{background:#fff;border-radius:26px;overflow:hidden}
+  .mock .mh{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff;padding:22px 16px 14px;display:flex;align-items:center;gap:10px}
+  .mock .mh .a{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.2);display:grid;place-items:center}
+  .mock .mh b{font-size:13px}.mock .mh small{font-size:10px;opacity:.85}
+  .mock .banner{margin:11px;border:1px solid var(--line);border-radius:13px;padding:11px;display:flex;gap:10px;align-items:center;box-shadow:0 6px 14px rgba(91,79,232,.12)}
+  .mock .banner .bi{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#eef,#dff);display:grid;place-items:center;font-size:18px}
+  .mock .banner b{font-size:12px}.mock .banner p{font-size:10px;color:var(--muted)}
+  .mock .bub{margin:0 11px 9px;padding:9px 12px;border-radius:13px;font-size:11.5px;line-height:1.5;max-width:82%}
+  .mock .bub.bot{background:#eef0ff;border-bottom-left-radius:4px}
+  .mock .bub.usr{background:var(--primary);color:#fff;margin-left:auto;border-bottom-right-radius:4px}
+  .mock .mslots{margin:0 11px 14px;display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .mock .mslots div{border:1.4px solid var(--primary);color:var(--primary);border-radius:9px;padding:7px;text-align:center;font-size:11px;font-weight:700}
+  /* section */
+  section{padding:64px 0}
+  .eyebrow{color:var(--primary);font-weight:800;font-size:13px;letter-spacing:.6px;text-transform:uppercase;text-align:center}
+  .stitle{font-size:31px;text-align:center;letter-spacing:-.6px;margin:8px 0 12px}
+  .ssub{text-align:center;color:var(--muted);font-size:15px;max-width:620px;margin:0 auto 42px;line-height:1.6}
+  /* problem/solution */
+  .ps{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:760px){.ps{grid-template-columns:1fr}}
+  .psc{border-radius:18px;padding:28px;border:1px solid var(--line)}
+  .psc.prob{background:#fff}.psc.sol{background:linear-gradient(160deg,#1c1743,#2a1f66);color:#fff}
+  .psc h3{font-size:18px;margin-bottom:16px;display:flex;align-items:center;gap:9px}
+  .psc ul{list-style:none;display:flex;flex-direction:column;gap:13px}
+  .psc li{display:flex;gap:11px;font-size:14px;line-height:1.5}
+  .psc li .mk{flex:none;width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:12px;font-weight:800;margin-top:1px}
+  .prob li .mk{background:#ffe6ea;color:#c8324a}.sol li .mk{background:var(--accent);color:#052}
+  /* features grid */
+  .feats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:820px){.feats{grid-template-columns:1fr}}
+  .feat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;transition:.18s}
+  .feat:hover{transform:translateY(-4px);box-shadow:0 16px 34px rgba(30,27,57,.08)}
+  .feat .fi{width:48px;height:48px;border-radius:13px;display:grid;place-items:center;font-size:23px;margin-bottom:15px}
+  .feat h4{font-size:16.5px;margin-bottom:8px}.feat p{font-size:13.5px;color:var(--muted);line-height:1.6}
+  /* service areas */
+  .areas{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:760px){.areas{grid-template-columns:1fr}}
+  .area{border-radius:18px;padding:26px;border:1px solid var(--line);background:#fff}
+  .area .tag{display:inline-block;font-size:12px;font-weight:800;padding:5px 12px;border-radius:999px;margin-bottom:14px}
+  .area.css .tag{background:#eae7ff;color:var(--primary-d)}.area.oss .tag{background:#ffe6ea;color:#c8324a}
+  .area h4{font-size:19px;margin-bottom:6px}.area .who{font-size:12.5px;color:var(--muted);margin-bottom:16px}
+  .area .step{display:flex;gap:11px;align-items:center;font-size:13.5px;padding:9px 0;border-bottom:1px dashed var(--line)}
+  .area .step:last-child{border:none}
+  .area .step .no{flex:none;width:24px;height:24px;border-radius:8px;background:var(--bg);display:grid;place-items:center;font-size:12px;font-weight:800;color:var(--primary)}
+  /* stats band */
+  .band{background:linear-gradient(135deg,#1c1743,#2f2278);color:#fff;border-radius:22px;padding:44px 30px;display:grid;grid-template-columns:repeat(4,1fr);gap:20px;text-align:center}
+  @media(max-width:760px){.band{grid-template-columns:1fr 1fr;gap:26px}}
+  .band .n{font-size:38px;font-weight:800;letter-spacing:-1px;background:linear-gradient(120deg,#fff,var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .band .l{font-size:13px;opacity:.85;margin-top:6px}
+  /* flow strip */
+  .fstrip{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;justify-content:center}
+  .fnode{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;text-align:center;min-width:130px;flex:1}
+  .fnode .fe{font-size:22px}.fnode b{display:block;font-size:13.5px;margin-top:6px}.fnode small{font-size:11px;color:var(--muted)}
+  .farrow{display:grid;place-items:center;padding:0 8px;color:var(--primary);font-size:20px;font-weight:800}
+  @media(max-width:760px){.farrow{transform:rotate(90deg);padding:6px 0}.fstrip{flex-direction:column;align-items:stretch}}
+  /* cta final */
+  .final{background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:22px;padding:52px 30px;text-align:center;color:#fff}
+  .final h2{font-size:30px;letter-spacing:-.6px}.final p{font-size:15px;opacity:.92;margin:12px 0 26px}
+  .final .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .final a{background:#fff;color:var(--primary-d);padding:13px 26px;border-radius:12px;font-weight:800;font-size:14px}
+  .final a.o{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.5)}
+  footer{padding:34px 0;text-align:center;color:var(--muted);font-size:12.5px}
+</style>
+</head>
+<body>
+<nav><div class="container inner">
+  <div class="lg">📞</div><b>OB 콜봇</b>
+  <div class="links"><a href="#problem">배경</a><a href="#feature">핵심기능</a><a href="#area">서비스영역</a><a href="#flow">동작흐름</a></div>
+  <a class="btn" href="simulator.html">시뮬레이터 체험</a>
+</div></nav>
+
+<!-- HERO -->
+<header class="hero"><div class="container grid">
+  <div>
+    <span class="badge"><span class="d"></span>출동 최적화 스케줄링 Agent</span>
+    <h1>기사 출동 스케줄링을<br><span class="hl">콜봇이 자동으로</span> 완결합니다</h1>
+    <p class="lead">개통·장애 방문 일정의 예약·안내·변경·취소를 OB 콜봇이 자동 처리합니다. Swing 시스템과 실시간 연동해 SM 출동을 최소화하고 고객 만족도를 높입니다.</p>
+    <div class="cta">
+      <a class="prime btn" href="simulator.html">▶ 콜봇 대화 체험하기</a>
+      <a class="ghost" href="dashboard.html">관리 대시보드 보기</a>
+    </div>
+  </div>
+  <div class="mock"><div class="scr">
+    <div class="mh"><div class="a">🤖</div><div><b>OB 콜봇</b><br><small>통화중 · 스케줄링</small></div></div>
+    <div class="banner"><div class="bi">📅</div><div><b>방문 일정 예약</b><p>런처 팝업 · 음성–시각 크로스 채널</p></div></div>
+    <div class="bub bot">희망하시는 방문 시간을 선택해 주세요 😊</div>
+    <div class="bub usr">7/26 토요일 오전이요</div>
+    <div class="mslots"><div>7/25 금</div><div style="background:var(--primary);color:#fff">7/26 토 ✓</div><div>7/27 일</div><div>7/28 월</div></div>
+  </div></div>
+</div></header>
+
+<!-- PROBLEM / SOLUTION -->
+<section id="problem"><div class="container">
+  <div class="eyebrow">도입 배경</div>
+  <h2 class="stitle">기사 스케줄링 비효율, 자동화로 해결</h2>
+  <p class="ssub">수작업 일정 조율과 잦은 변경·취소로 발생하던 출동 비효율을 OB 콜봇 자동화로 근본 해결합니다.</p>
+  <div class="ps">
+    <div class="psc prob">
+      <h3>😟 기존의 문제</h3>
+      <ul>
+        <li><span class="mk">!</span>전화·문자 수작업 일정 조율로 상담 리소스 과다 투입</li>
+        <li><span class="mk">!</span>잦은 방문 일정 변경·취소로 기사 동선 비효율</li>
+        <li><span class="mk">!</span>불필요한 SM 출동 발생 및 고객 대기 불만</li>
+        <li><span class="mk">!</span>미응답 고객 재접촉 누락</li>
+      </ul>
+    </div>
+    <div class="psc sol">
+      <h3>✨ OB 콜봇 솔루션</h3>
+      <ul>
+        <li><span class="mk">✓</span>PDS 자동 발신으로 타겟 고객 선제 안내</li>
+        <li><span class="mk">✓</span>예약·변경·취소를 콜봇이 자동 완결 처리</li>
+        <li><span class="mk">✓</span>Swing 실시간 연동 · 확인 문자 자동 발송</li>
+        <li><span class="mk">✓</span>미응답 시 재시도 후 문자 발송으로 대체</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<!-- FEATURES -->
+<section id="feature" style="background:#fff;border-block:1px solid var(--line)"><div class="container">
+  <div class="eyebrow">핵심 기능</div>
+  <h2 class="stitle">3가지 기술이 만드는 자동 완결</h2>
+  <p class="ssub">발신부터 화면 안내, 시스템 반영까지 끊김 없이 이어지는 스케줄링 자동화</p>
+  <div class="feats">
+    <div class="feat"><div class="fi" style="background:#eae7ff">📡</div><h4>PDS 자동 콜 발신</h4><p>타겟팅된 고객 대상으로 콜봇이 자동으로 콜을 발신하여 방문 일정을 선제적으로 안내합니다.</p></div>
+    <div class="feat"><div class="fi" style="background:#d7fff4">📱</div><h4>런처 솔루션</h4><p>통화와 동시에 스마트폰 화면에 팝업 배너를 띄우는 음성–시각 크로스 채널로 통화 성공률을 극대화합니다.</p></div>
+    <div class="feat"><div class="fi" style="background:#fff2d6">🔗</div><h4>Swing 자동 연동</h4><p>예약 확정·변경·취소를 Swing 시스템에 실시간 반영하고 확인 문자를 자동 발송합니다.</p></div>
+  </div>
+</div></section>
+
+<!-- SERVICE AREAS -->
+<section id="area"><div class="container">
+  <div class="eyebrow">서비스 영역</div>
+  <h2 class="stitle">개통과 장애, 두 영역을 모두 커버</h2>
+  <p class="ssub">CSS(개통)와 OSS(장애) 전 과정에서 방문 스케줄링을 자동으로 처리합니다.</p>
+  <div class="areas">
+    <div class="area css">
+      <span class="tag">개통 · CSS</span>
+      <h4>방문일정 예약 & D-1 안내</h4>
+      <div class="who">대상 · 신규가입 / 이사 / 상품변경</div>
+      <div class="step"><span class="no">1</span>방문 일정 예약 (달력·제안 방식)</div>
+      <div class="step"><span class="no">2</span>D-1 방문 일정 안내</div>
+      <div class="step"><span class="no">3</span>일정 변경 · 취소 자동 처리</div>
+      <div class="step"><span class="no">4</span>Swing 반영 & 확인 문자 발송</div>
+    </div>
+    <div class="area oss">
+      <span class="tag">장애 · OSS</span>
+      <h4>장애 방문 스케줄링</h4>
+      <div class="who">대상 · AS / 댁내배선</div>
+      <div class="step"><span class="no">1</span>CEI 원격 진단으로 방문 필요 판단</div>
+      <div class="step"><span class="no">2</span>정상 복구 시 방문 불필요 자동 취소</div>
+      <div class="step"><span class="no">3</span>D-1 방문 일정 안내·변경·취소</div>
+      <div class="step"><span class="no">4</span>사전 알림 & 확인 문자 발송</div>
+    </div>
+  </div>
+</div></section>
+
+<!-- STATS BAND -->
+<section><div class="container"><div class="band">
+  <div><div class="n">78.6%</div><div class="l">콜봇 자동 처리율</div></div>
+  <div><div class="n">-34%</div><div class="l">SM 추가 출동 감소</div></div>
+  <div><div class="n">-21%</div><div class="l">일정 변경·취소 건수</div></div>
+  <div><div class="n">24/7</div><div class="l">무중단 자동 응대</div></div>
+</div></div></section>
+
+<!-- FLOW -->
+<section id="flow" style="background:#fff;border-top:1px solid var(--line)"><div class="container">
+  <div class="eyebrow">동작 흐름</div>
+  <h2 class="stitle">발신에서 확정까지, 한 번의 통화로</h2>
+  <p class="ssub">런처 팝업과 함께 진행되는 콜봇 대화 흐름 (개통 예약 기준)</p>
+  <div class="fstrip">
+    <div class="fnode"><div class="fe">📡</div><b>PDS 발신</b><small>타겟 고객 자동 콜</small></div>
+    <div class="farrow">→</div>
+    <div class="fnode"><div class="fe">📱</div><b>런처 팝업</b><small>화면 배너 노출</small></div>
+    <div class="farrow">→</div>
+    <div class="fnode"><div class="fe">🔐</div><b>본인 확인</b><small>고객 인증</small></div>
+    <div class="farrow">→</div>
+    <div class="fnode"><div class="fe">📅</div><b>일정 예약</b><small>달력·제안 선택</small></div>
+    <div class="farrow">→</div>
+    <div class="fnode"><div class="fe">✅</div><b>Swing 확정</b><small>확인 문자 발송</small></div>
+  </div>
+  <p style="text-align:center;margin-top:22px;font-size:13px;color:var(--muted)">
+    미응답 시 → 재시도 후 문자 발송으로 자동 대체 · <a href="flow.html" style="color:var(--primary);font-weight:700">전체 Flow 다이어그램 보기 →</a>
+  </p>
+</div></div></section>
+
+<!-- FINAL CTA -->
+<section><div class="container"><div class="final">
+  <h2>지금 콜봇을 직접 체험해 보세요</h2>
+  <p>고객 입장에서 콜봇과 대화하며 예약·변경·취소 흐름을 확인할 수 있습니다.</p>
+  <div class="row">
+    <a href="simulator.html">▶ 대화 시뮬레이터</a>
+    <a class="o" href="dashboard.html">📊 관리 대시보드</a>
+    <a class="o" href="flow.html">🔀 Flow 다이어그램</a>
+  </div>
+</div></div></section>
+
+<footer><div class="container">OB 콜봇 구축 프로젝트 · 출동 최적화 스케줄링 Agent · <a href="index.html" style="color:var(--primary)">프로젝트 목록</a></div></footer>
+</body>
+</html>
