@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>우리 아이 주간 놀이 플래너</title>
+</head>
+<body>
+<style>
+  :root {
+    --paper: #F3F6F1;
+    --surface: #FFFFFF;
+    --surface-2: #F9FBF6;
+    --ink: #222A23;
+    --muted: #67705F;
+    --line: #E3EADE;
+    --accent: #3F9A6B;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #E6F3EC;
+    --shadow: 0 1px 2px rgba(30,42,32,.06), 0 8px 24px rgba(30,42,32,.07);
+    --radius: 16px;
+    --d-sense: #E08A3C; --d-lang: #5566CC; --d-fine: #C9599B; --d-gross: #2E9E9E;
+    --d-cog: #D65D5D; --d-emo: #E8734E; --d-music: #8A5CD1; --d-book: #B0872E;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #12160F; --surface: #1D231C; --surface-2: #181D17; --ink: #E9EFE6;
+      --muted: #9EA997; --line: #2D352C; --accent: #5DC189; --accent-ink: #0E130E;
+      --accent-soft: #223026; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+      --d-sense:#EDA45C; --d-lang:#8A93E8; --d-fine:#E27CB6; --d-gross:#3FC0BC;
+      --d-cog:#EA7C7C; --d-emo:#F0916E; --d-music:#AC86E0; --d-book:#D0A94E;
+    }
+  }
+  :root[data-theme="light"] {
+    --paper:#F3F6F1; --surface:#FFFFFF; --surface-2:#F9FBF6; --ink:#222A23; --muted:#67705F;
+    --line:#E3EADE; --accent:#3F9A6B; --accent-ink:#FFFFFF; --accent-soft:#E6F3EC;
+    --shadow:0 1px 2px rgba(30,42,32,.06), 0 8px 24px rgba(30,42,32,.07);
+    --d-sense:#E08A3C; --d-lang:#5566CC; --d-fine:#C9599B; --d-gross:#2E9E9E;
+    --d-cog:#D65D5D; --d-emo:#E8734E; --d-music:#8A5CD1; --d-book:#B0872E;
+  }
+  :root[data-theme="dark"] {
+    --paper:#12160F; --surface:#1D231C; --surface-2:#181D17; --ink:#E9EFE6; --muted:#9EA997;
+    --line:#2D352C; --accent:#5DC189; --accent-ink:#0E130E; --accent-soft:#223026;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    --d-sense:#EDA45C; --d-lang:#8A93E8; --d-fine:#E27CB6; --d-gross:#3FC0BC;
+    --d-cog:#EA7C7C; --d-emo:#F0916E; --d-music:#AC86E0; --d-book:#D0A94E;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", "Noto Sans KR", system-ui, -apple-system, sans-serif;
+    line-height: 1.5; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1140px; margin: 0 auto; padding: 32px 20px 80px; }
+  .app-header { margin-bottom: 24px; }
+  .eyebrow { font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); font-weight:700; margin:0 0 8px; }
+  h1 { font-size: clamp(26px,4vw,38px); margin:0 0 8px; letter-spacing:-.02em; text-wrap:balance; }
+  .lede { color: var(--muted); margin:0; max-width:60ch; }
+
+  .layout { display:grid; grid-template-columns: 330px 1fr; gap:24px; align-items:start; }
+  @media (max-width: 900px){ .layout{ grid-template-columns:1fr; } }
+
+  .panel { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px; }
+  .panel + .panel { margin-top:16px; }
+  .panel h2 { font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:0 0 14px; font-weight:700; }
+
+  .field { margin-bottom:16px; }
+  .field label { display:block; font-size:13px; color:var(--muted); font-weight:600; margin-bottom:7px; }
+  input[type="month"] {
+    width:100%; border:1px solid var(--line); background:var(--surface-2); color:var(--ink);
+    border-radius:10px; padding:9px 12px; font-family:inherit; font-size:15px;
+  }
+  input[type="month"]:focus { outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
+  .age-readout { font-size:14px; color:var(--ink); background:var(--accent-soft); border-radius:10px; padding:9px 12px; margin-top:8px; font-weight:600; }
+  .age-readout span { color:var(--accent); }
+
+  .chip-head { display:flex; justify-content:space-between; align-items:center; margin:0 0 10px; }
+  .link-btn { background:none; border:none; color:var(--accent); font-family:inherit; font-size:13px; cursor:pointer; padding:4px 6px; border-radius:8px; font-weight:600; }
+  .link-btn:hover { background:var(--accent-soft); }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .chip {
+    display:inline-flex; align-items:center; gap:7px; cursor:pointer; user-select:none;
+    border:1px solid var(--line); background:var(--surface-2); color:var(--ink);
+    padding:7px 11px; border-radius:10px; font-size:14px; transition:all .12s;
+  }
+  .chip .dot { width:9px; height:9px; border-radius:50%; background:var(--cc,var(--accent)); }
+  .chip[data-on="true"] { border-color:var(--cc,var(--accent)); background:color-mix(in srgb, var(--cc,var(--accent)) 14%, transparent); }
+
+  .btn {
+    appearance:none; border:1px solid var(--accent); background:var(--accent); color:var(--accent-ink);
+    font-family:inherit; font-size:15px; font-weight:700; padding:11px 20px; border-radius:12px;
+    cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:var(--shadow);
+    transition:filter .15s, transform .05s;
+  }
+  .btn:hover { filter:brightness(1.05); }
+  .btn:active { transform:translateY(1px); }
+  .btn.ghost { background:var(--surface); color:var(--ink); border-color:var(--line); box-shadow:none; }
+  .btn.block { width:100%; justify-content:center; }
+
+  .stage-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+  .stage-title { font-size:18px; font-weight:800; letter-spacing:-.01em; }
+  .stage-sub { color:var(--muted); font-size:14px; font-weight:500; }
+  .stage-actions { display:flex; gap:10px; }
+
+  .week { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  @media (max-width:560px){ .week{ grid-template-columns:1fr; } }
+
+  .day {
+    background:var(--surface); border:1px solid var(--line); border-left:5px solid var(--dc,var(--accent));
+    border-radius:12px; padding:15px 16px; display:flex; flex-direction:column; gap:8px; break-inside:avoid;
+  }
+  .day-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .dow { font-weight:800; font-size:15px; }
+  .dow small { color:var(--muted); font-weight:600; font-size:12px; margin-left:6px; }
+  .tag { font-size:11.5px; font-weight:700; color:var(--dc,var(--accent)); background:color-mix(in srgb,var(--dc,var(--accent)) 13%, transparent); padding:3px 9px; border-radius:999px; white-space:nowrap; }
+  .act-name { font-size:17px; font-weight:800; margin:2px 0 0; letter-spacing:-.01em; }
+  .act-how { margin:0; font-size:14px; color:var(--ink); }
+  .act-meta { display:flex; flex-direction:column; gap:4px; margin-top:2px; padding-top:9px; border-top:1px dashed var(--line); }
+  .act-meta div { font-size:12.5px; color:var(--muted); }
+  .act-meta b { color:var(--ink); font-weight:700; }
+
+  .tips { margin-top:24px; }
+  .tips ul { margin:0; padding-left:20px; color:var(--muted); }
+  .tips li { margin:6px 0; }
+  .tips li b { color:var(--ink); font-weight:700; }
+
+  .print-title { display:none; }
+
+  @media print {
+    .app-header, .col-controls, .stage-actions, .tips { display:none !important; }
+    .layout { display:block; }
+    body { background:#fff; }
+    .panel { border:none; box-shadow:none; padding:0; }
+    .print-title { display:block; margin:0 0 14px; }
+    .print-title h2 { font-size:20pt; margin:0 0 3px; }
+    .print-title p { margin:0; font-size:11pt; color:#555; }
+    .stage-head { display:none; }
+    .week { grid-template-columns:repeat(2,1fr); gap:10px; }
+    .day { border:1px solid #ccc; border-left:5px solid var(--dc,#666); }
+    .day, .tag { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    @page { size:A4 portrait; margin:12mm; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="app-header">
+    <p class="eyebrow">부모용 · 화면 없는 주간 놀이 계획</p>
+    <h1>우리 아이 주간 놀이 플래너</h1>
+    <p class="lede">아이 개월 수에 맞는 놀이를 요일별로 짜드려요. 전부 집에 있는 물건으로, 화면 없이 부모와 함께 하는 활동입니다. 인쇄해서 붙여두고 하나씩 해보세요.</p>
+  </header>
+
+  <div class="layout">
+    <div class="col-controls">
+      <section class="panel">
+        <h2>1. 우리 아이</h2>
+        <div class="field">
+          <label for="birth">태어난 달</label>
+          <input type="month" id="birth" value="2024-05" max="2026-07">
+          <div class="age-readout" id="ageOut">개월 수 계산 중…</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>2. 관심 영역</h2>
+        <div class="chip-head">
+          <span class="stage-sub" id="focusCount">전체</span>
+          <div>
+            <button class="link-btn" id="focAll">전체</button>
+            <button class="link-btn" id="focNone">해제</button>
+          </div>
+        </div>
+        <div class="chips" id="domChips"></div>
+      </section>
+
+      <section class="panel">
+        <button class="btn block" id="genBtn" type="button">🎲 이번 주 계획 다시 뽑기</button>
+      </section>
+
+      <section class="panel tips">
+        <h2>이렇게 쓰세요</h2>
+        <ul>
+          <li>하루에 <b>딱 하나</b>면 충분해요. 짧게 5~15분, 아이가 흥미 있을 때.</li>
+          <li>같은 놀이를 <b>반복</b>해도 좋아요 — 아이는 반복으로 배웁니다.</li>
+          <li>준비물은 대부분 <b>집에 있는 것</b>이에요. 없으면 비슷한 걸로.</li>
+          <li>화면은 부모만, 아이는 <b>손·몸·목소리</b>로 놀아요.</li>
+        </ul>
+      </section>
+    </div>
+
+    <div class="col-stage">
+      <section class="panel">
+        <div class="print-title">
+          <h2 id="ptTitle">이번 주 놀이 계획</h2>
+          <p id="ptSub"></p>
+        </div>
+        <div class="stage-head">
+          <div>
+            <div class="stage-title">이번 주 놀이 계획</div>
+            <div class="stage-sub" id="weekMeta"></div>
+          </div>
+          <div class="stage-actions">
+            <button class="btn ghost" id="themeBtn" type="button">테마</button>
+            <button class="btn" id="printBtn" type="button">🖨️ 인쇄하기</button>
+          </div>
+        </div>
+        <div class="week" id="week"></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const DOMAINS = {
+    sense: { label:"감각·오감", cc:"var(--d-sense)" },
+    lang:  { label:"언어·말",   cc:"var(--d-lang)" },
+    fine:  { label:"소근육",     cc:"var(--d-fine)" },
+    gross: { label:"대근육",     cc:"var(--d-gross)" },
+    cog:   { label:"인지·탐색",  cc:"var(--d-cog)" },
+    emo:   { label:"정서·교감",  cc:"var(--d-emo)" },
+    music: { label:"음악·리듬",  cc:"var(--d-music)" },
+    book:  { label:"책·이야기",  cc:"var(--d-book)" },
+  };
+  const DORDER = ["sense","lang","fine","gross","cog","emo","music","book"];
+
+  // 활동 라이브러리: band = [최소개월, 최대개월]
+  const ACTS = [
+    // 감각
+    { d:"sense", name:"쌀·콩 촉감놀이", band:[15,42], mat:"큰 대야, 쌀이나 콩, 컵·숟가락", how:"대야에 쌀을 담고 컵으로 담았다 부었다 하며 손으로 만지게 해요.", why:"촉각 자극과 손 조절 발달" },
+    { d:"sense", name:"얼음 녹이기", band:[22,42], mat:"얼음, 쟁반, 수건", how:"얼음을 쟁반에 놓고 손으로 만지며 차가움과 녹는 모습을 함께 봐요.", why:"온도 감각과 인과 개념" },
+    { d:"sense", name:"밀가루 반죽 주무르기", band:[16,42], mat:"밀가루, 물", how:"밀가루에 물을 조금씩 넣어 반죽을 만들고 마음껏 주무르게 해요.", why:"촉각 자극과 소근육" },
+    { d:"sense", name:"냄새 맡고 맞히기", band:[24,42], mat:"과일·비누·커피 등 향 나는 것", how:"눈을 감고 냄새를 맡은 뒤 무엇인지 이름을 말해봐요.", why:"후각 발달과 어휘 확장" },
+    { d:"sense", name:"촉감 상자", band:[24,42], mat:"상자, 솜·수세미·나무토막 등", how:"상자 속 물건을 손으로 만지고 '보들보들/까끌까끌' 느낌을 말해요.", why:"촉각 변별과 표현 어휘" },
+    // 언어
+    { d:"lang", name:"그림책 이름 대기", band:[16,36], mat:"그림책", how:"그림을 손가락으로 짚으며 '이건 사과' 하고 이름을 또박또박 말해줘요.", why:"어휘 습득의 기본" },
+    { d:"lang", name:"'이게 뭐야?' 놀이", band:[16,36], mat:"없음", how:"집안 물건을 가리키며 '이게 뭐야?' 묻고 아이 대답을 기다려요.", why:"명명과 표현 언어" },
+    { d:"lang", name:"동물 소리 흉내", band:[15,36], mat:"동물 그림이나 인형", how:"동물을 보여주며 '멍멍', '음메' 소리를 함께 내봐요.", why:"발성 연습과 모방" },
+    { d:"lang", name:"두 낱말 잇기", band:[24,40], mat:"없음", how:"'엄마 물', '큰 공'처럼 두 단어를 붙여 말하도록 신나게 따라 해요.", why:"첫 문장으로 가는 다리" },
+    { d:"lang", name:"오늘 하루 되짚기", band:[26,42], mat:"없음", how:"자기 전 '오늘 뭐 했지?' 하며 있었던 일을 짧게 말로 되짚어요.", why:"기억 회상과 이야기 능력" },
+    // 소근육
+    { d:"fine", name:"스티커 붙였다 떼기", band:[16,36], mat:"스티커, 종이", how:"스티커를 떼어 종이에 붙이게 해요. 위치는 자유롭게.", why:"손끝 조절과 집중" },
+    { d:"fine", name:"집게로 옮기기", band:[24,42], mat:"빨래집게, 폼폼이나 콩, 그릇 두 개", how:"집게로 작은 물건을 집어 다른 그릇으로 옮겨요.", why:"손 힘과 집기 기술" },
+    { d:"fine", name:"크레용 끄적이기", band:[16,36], mat:"큰 종이, 크레용", how:"큰 종이에 자유롭게 끄적이게 두고 함께 그려요.", why:"쓰기의 준비 단계" },
+    { d:"fine", name:"뚜껑 열고 닫기", band:[16,34], mat:"빈 통 여러 개", how:"통과 뚜껑을 짝 맞춰 돌려 열고 닫게 해요.", why:"손목 회전과 짝짓기" },
+    { d:"fine", name:"구멍에 넣기", band:[16,30], mat:"뚜껑에 구멍 낸 통, 큰 단추", how:"큰 단추를 구멍에 쏙 넣게 해요. (작은 물건 삼킴 주의)", why:"눈과 손의 협응" },
+    // 대근육
+    { d:"gross", name:"쿠션 징검다리", band:[16,42], mat:"방석·쿠션 여러 개", how:"쿠션을 띄엄띄엄 놓고 밟으며 건너가요. 손잡아 주세요.", why:"균형 감각과 다리 힘" },
+    { d:"gross", name:"공 주고받기", band:[15,42], mat:"공", how:"마주 앉아 공을 굴리고 던지며 주고받아요.", why:"협응과 차례 지키기" },
+    { d:"gross", name:"풍선 안 떨어뜨리기", band:[24,42], mat:"풍선", how:"풍선을 톡톡 쳐서 바닥에 안 닿게 해요.", why:"눈·손·발 협응" },
+    { d:"gross", name:"터널 기어가기", band:[16,36], mat:"이불, 의자", how:"의자에 이불을 덮어 터널을 만들고 기어서 통과해요.", why:"전신 협응과 공간감" },
+    { d:"gross", name:"멈춤 춤", band:[24,42], mat:"없음 (부모 노래)", how:"노래를 부르며 춤추다가 멈추면 '얼음!' 하고 정지해요.", why:"자기 조절과 청각 반응" },
+    // 인지·탐색
+    { d:"cog", name:"같은 색 모으기", band:[24,42], mat:"여러 색 물건", how:"'빨간 것 찾자!' 하며 같은 색끼리 모아요.", why:"색 분류와 개념 형성" },
+    { d:"cog", name:"크고 작은 것 나누기", band:[24,42], mat:"크기 다른 물건들", how:"큰 것과 작은 것을 두 무더기로 나눠요.", why:"크기 비교 개념" },
+    { d:"cog", name:"숨긴 물건 찾기", band:[16,30], mat:"컵, 작은 장난감", how:"컵 아래 장난감을 숨기고 '어디 갔지?' 하며 찾게 해요.", why:"대상영속성과 기억" },
+    { d:"cog", name:"컵 쌓고 무너뜨리기", band:[16,36], mat:"종이컵", how:"종이컵을 높이 쌓고 무너뜨리며 반복해요.", why:"공간감과 인과 관계" },
+    { d:"cog", name:"양말 짝 맞추기", band:[24,42], mat:"빨래한 양말", how:"빨래에서 같은 양말을 찾아 짝을 지어요.", why:"짝짓기와 관찰력" },
+    // 정서·교감
+    { d:"emo", name:"거울 표정놀이", band:[16,36], mat:"거울", how:"거울을 보며 웃는 얼굴, 찡그린 얼굴을 함께 지어요.", why:"자기 인식과 정서 표현" },
+    { d:"emo", name:"인형 재우기", band:[16,42], mat:"인형이나 애착 인형", how:"인형을 안고 토닥이며 '코 자자' 하고 재워요.", why:"돌봄과 공감의 씨앗" },
+    { d:"emo", name:"'안아줘' 신호", band:[16,36], mat:"없음", how:"'안아줘' 하면 꼭 안아주며 요구를 말로 표현하게 해요.", why:"애착과 요구 표현" },
+    { d:"emo", name:"감정에 이름 붙이기", band:[26,42], mat:"없음", how:"'속상했구나', '신났네' 하고 아이 기분을 말로 짚어줘요.", why:"감정 어휘와 정서 조절" },
+    { d:"emo", name:"함께 정리하기", band:[24,42], mat:"장난감·빨래", how:"'같이 치우자' 하며 작은 집안일을 함께 해요.", why:"자립심과 소속감" },
+    // 음악·리듬
+    { d:"music", name:"냄비 드럼", band:[15,36], mat:"냄비, 나무 숟가락", how:"엎은 냄비를 숟가락으로 두드리며 리듬을 만들어요.", why:"리듬감과 청각 자극" },
+    { d:"music", name:"손유희 노래", band:[15,30], mat:"없음", how:"곤지곤지·잼잼처럼 손동작 노래를 함께 해요.", why:"소근육과 리듬" },
+    { d:"music", name:"콩 셰이커 흔들기", band:[16,36], mat:"뚜껑 있는 통, 콩", how:"통에 콩을 넣고 흔들며 노래에 맞춰 소리를 내요.", why:"리듬과 인과 관계" },
+    { d:"music", name:"느리게 빠르게", band:[24,42], mat:"없음", how:"같은 노래를 느리게, 빠르게 부르며 그 속도로 움직여요.", why:"속도 개념과 조절" },
+    { d:"music", name:"율동 따라하기", band:[16,36], mat:"없음", how:"간단한 동작 노래를 부르며 동작을 따라 하게 해요.", why:"모방과 대근육" },
+    // 책·이야기
+    { d:"book", name:"같은 책 반복 읽기", band:[16,42], mat:"좋아하는 그림책", how:"아이가 고른 책을 몇 번이고 반복해서 읽어줘요.", why:"어휘와 이야기 예측력" },
+    { d:"book", name:"플랩북 열어보기", band:[16,36], mat:"넘기는 그림책", how:"숨은 그림 덮개를 함께 열며 '뭐가 있을까?' 해요.", why:"호기심과 소근육" },
+    { d:"book", name:"다음 장면 맞히기", band:[26,42], mat:"익숙한 그림책", how:"페이지를 넘기기 전 '다음엔 뭐가 나올까?' 물어봐요.", why:"예측과 표현 언어" },
+    { d:"book", name:"손가락으로 짚으며 읽기", band:[24,42], mat:"그림책", how:"그림과 글자를 손가락으로 짚으며 천천히 읽어줘요.", why:"문해력의 준비" },
+    { d:"book", name:"우리 아이 사진책", band:[24,42], mat:"종이, 가족·아이 사진", how:"사진을 붙여 '아빠랑 공원 갔지' 같은 짧은 이야기를 만들어요.", why:"이야기 능력과 애착" },
+  ];
+
+  const DOW = ["월요일","화요일","수요일","목요일","금요일","토요일","일요일"];
+
+  const state = { months: 0, focus: new Set(DORDER), plan: [] };
+
+  const $ = s => document.querySelector(s);
+  const el = (t,c) => { const n=document.createElement(t); if(c)n.className=c; return n; };
+  const shuffle = a => { for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+
+  function computeAge() {
+    const v = $("#birth").value; // YYYY-MM
+    if (!v) { state.months = 26; return; }
+    const [by,bm] = v.split("-").map(Number);
+    const now = new Date();
+    let m = (now.getFullYear()-by)*12 + (now.getMonth()+1 - bm);
+    if (m < 0) m = 0;
+    state.months = m;
+    const yr = Math.floor(m/12), mo = m%12;
+    const ageStr = (yr>0? "만 "+yr+"세" : "") + (mo>0? " "+mo+"개월" : (yr>0?"":"신생아"));
+    $("#ageOut").innerHTML = "<span>"+m+"개월</span> · " + ageStr.trim() + " 눈높이 놀이";
+  }
+
+  function mondayLabel() {
+    const now = new Date();
+    const day = (now.getDay()+6)%7; // Mon=0
+    const mon = new Date(now); mon.setDate(now.getDate()-day);
+    const sun = new Date(mon); sun.setDate(mon.getDate()+6);
+    const f = d => (d.getMonth()+1)+"월 "+d.getDate()+"일";
+    return f(mon)+" ~ "+f(sun);
+  }
+
+  // domain chips
+  const chipBox = $("#domChips");
+  DORDER.forEach(key => {
+    const c = el("div","chip");
+    c.dataset.on = state.focus.has(key);
+    c.style.setProperty("--cc", DOMAINS[key].cc);
+    c.innerHTML = '<span class="dot"></span>'+DOMAINS[key].label;
+    c.addEventListener("click", () => {
+      if (state.focus.has(key)) state.focus.delete(key); else state.focus.add(key);
+      c.dataset.on = state.focus.has(key);
+      updateFocusCount(); generate();
+    });
+    chipBox.appendChild(c);
+  });
+  function updateFocusCount() {
+    const n = state.focus.size;
+    $("#focusCount").textContent = (n===0||n===DORDER.length) ? "전체" : n+"개 영역";
+  }
+  $("#focAll").addEventListener("click", () => {
+    state.focus = new Set(DORDER);
+    [...chipBox.children].forEach(c=>c.dataset.on="true");
+    updateFocusCount(); generate();
+  });
+  $("#focNone").addEventListener("click", () => {
+    state.focus = new Set();
+    [...chipBox.children].forEach(c=>c.dataset.on="false");
+    updateFocusCount(); generate();
+  });
+
+  function generate() {
+    const focus = state.focus.size ? state.focus : new Set(DORDER);
+    let pool = ACTS.filter(a => state.months>=a.band[0] && state.months<=a.band[1] && focus.has(a.d));
+    if (pool.length === 0) pool = ACTS.filter(a => focus.has(a.d)); // 개월 밖이면 영역만 맞춤
+    if (pool.length === 0) pool = ACTS.slice();
+
+    const plan = [];
+    let bag = shuffle(pool.slice());
+    let lastD = null;
+    for (let i=0;i<7;i++){
+      if (bag.length===0) bag = shuffle(pool.slice());
+      // 같은 영역 연속 피하기
+      let idx = bag.findIndex(a => a.d !== lastD);
+      if (idx === -1) idx = 0;
+      const pick = bag.splice(idx,1)[0];
+      plan.push(pick); lastD = pick.d;
+    }
+    state.plan = plan;
+    render();
+  }
+
+  function render() {
+    const wk = mondayLabel();
+    $("#weekMeta").textContent = state.months + "개월 · " + wk;
+    $("#ptSub").textContent = state.months + "개월 · " + wk;
+    const box = $("#week"); box.innerHTML = "";
+    state.plan.forEach((a,i) => {
+      const dom = DOMAINS[a.d];
+      const card = el("div","day");
+      card.style.setProperty("--dc", dom.cc);
+      card.innerHTML =
+        '<div class="day-head"><span class="dow">'+DOW[i]+'</span>'+
+        '<span class="tag">'+dom.label+'</span></div>'+
+        '<h3 class="act-name">'+a.name+'</h3>'+
+        '<p class="act-how">'+a.how+'</p>'+
+        '<div class="act-meta"><div><b>준비물</b> · '+a.mat+'</div>'+
+        '<div><b>발달 포인트</b> · '+a.why+'</div></div>';
+      box.appendChild(card);
+    });
+  }
+
+  $("#birth").addEventListener("change", () => { computeAge(); generate(); });
+  $("#genBtn").addEventListener("click", generate);
+  $("#printBtn").addEventListener("click", () => window.print());
+  $("#themeBtn").addEventListener("click", () => {
+    const root = document.documentElement;
+    const now = root.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark":"light");
+    root.setAttribute("data-theme", now==="dark"?"light":"dark");
+  });
+
+  computeAge(); updateFocusCount(); generate();
+})();
+</script>
+</body>
+</html>
