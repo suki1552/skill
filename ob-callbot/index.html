@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OB 콜봇 프로젝트 — 바이브 코딩</title>
+<style>
+  :root{--primary:#5B4FE8;--primary-d:#3D34B0;--accent:#00C9A7;--ink:#14122B;--muted:#6B7280;--line:#E9EAF2;--bg:#F6F7FB}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Malgun Gothic','Apple SD Gothic Neo',system-ui,sans-serif;color:var(--ink);
+    background:radial-gradient(1000px 500px at 10% -10%,#efeaff 0,transparent 55%),
+    radial-gradient(800px 460px at 110% 5%,#d7fff4 0,transparent 50%),var(--bg);min-height:100vh;padding:44px 18px}
+  .wrap{max-width:1040px;margin:0 auto}
+  .head{text-align:center;margin-bottom:40px}
+  .badge{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);padding:7px 15px;border-radius:999px;font-size:12.5px;font-weight:700;color:var(--primary-d);margin-bottom:18px}
+  .badge .d{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+  .head h1{font-size:38px;letter-spacing:-1px;line-height:1.2}
+  .head h1 .hl{background:linear-gradient(120deg,var(--primary),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .head p{font-size:15.5px;color:var(--muted);margin-top:14px;line-height:1.6}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:720px){.cards{grid-template-columns:1fr}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px;text-decoration:none;color:inherit;
+    display:flex;flex-direction:column;gap:12px;transition:.2s;position:relative;overflow:hidden}
+  .card:hover{transform:translateY(-5px);box-shadow:0 22px 44px rgba(30,27,57,.1)}
+  .card .no{position:absolute;top:18px;right:22px;font-size:52px;font-weight:800;color:#f0f0f7;line-height:1}
+  .card .ic{width:56px;height:56px;border-radius:15px;display:grid;place-items:center;font-size:27px}
+  .card h3{font-size:19px}.card p{font-size:13.5px;color:var(--muted);line-height:1.55;flex:1}
+  .card .go{font-size:13.5px;font-weight:800;color:var(--primary);display:flex;align-items:center;gap:6px}
+  .tags{display:flex;gap:6px;flex-wrap:wrap}
+  .tags span{font-size:11px;font-weight:700;color:var(--muted);background:var(--bg);padding:4px 10px;border-radius:999px}
+  .foot{text-align:center;margin-top:38px;font-size:12.5px;color:var(--muted);line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <span class="badge"><span class="d"></span>바이브 코딩 · PPT 학습 산출물</span>
+    <h1>OB 콜봇 구축 프로젝트<br><span class="hl">출동 최적화 스케줄링 Agent</span></h1>
+    <p>첨부된 제안 자료를 학습해 만든 4개의 인터랙티브 산출물입니다.<br>카드를 눌러 각 화면을 체험해 보세요.</p>
+  </div>
+
+  <div class="cards">
+    <a class="card" href="simulator.html">
+      <div class="no">01</div>
+      <div class="ic" style="background:#eae7ff">📞</div>
+      <h3>콜봇 실행 콘솔</h3>
+      <p>발신 대상 큐에서 고객을 선택해 콜봇을 실행하고, 예약·변경·취소 결과를 <b>대시보드에 실제 저장</b>합니다. 대상 추가·달력 예약·런처 팝업까지 동작합니다.</p>
+      <div class="tags"><span>실데이터 저장</span><span>대상 큐</span><span>달력 예약</span></div>
+      <div class="go">실행하기 →</div>
+    </a>
+    <a class="card" href="dashboard.html">
+      <div class="no">02</div>
+      <div class="ic" style="background:#d7fff4">📊</div>
+      <h3>스케줄링 관리 대시보드</h3>
+      <p>콜봇 실행 결과가 실시간 반영됩니다. KPI·차트 자동 계산 + <b>상태변경·기사배정·추가·삭제·검색·CSV 내보내기</b>까지 실제로 동작합니다.</p>
+      <div class="tags"><span>CRUD</span><span>검색·필터</span><span>CSV</span></div>
+      <div class="go">열어보기 →</div>
+    </a>
+    <a class="card" href="landing.html">
+      <div class="no">03</div>
+      <div class="ic" style="background:#fff2d6">🚀</div>
+      <h3>제안 · 소개 랜딩 페이지</h3>
+      <p>도입 배경, 핵심 기능(PDS·런처·Swing), 서비스 영역, 동작 흐름을 소개하고 <b>도입 상담 신청 폼</b>으로 문의를 접수합니다.</p>
+      <div class="tags"><span>서비스소개</span><span>상담 신청</span><span>문의 접수</span></div>
+      <div class="go">둘러보기 →</div>
+    </a>
+    <a class="card" href="flow.html">
+      <div class="no">04</div>
+      <div class="ic" style="background:#ffe6ea">🔀</div>
+      <h3>Flow 편집기</h3>
+      <p>3가지 콜봇 대화 흐름을 순서도로 시각화하고, 노드 클릭으로 <b>라벨·업무 메모를 편집·저장</b>합니다. 다이어그램을 <b>SVG로 내보내기</b>할 수 있습니다.</p>
+      <div class="tags"><span>노드 편집</span><span>메모 저장</span><span>SVG 내보내기</span></div>
+      <div class="go">편집하기 →</div>
+    </a>
+  </div>
+
+  <div class="foot">
+    OB 콜봇 구축 프로젝트 · 출동 최적화 스케줄링 Agent<br>
+    PDS 자동발신 · 런처 음성–시각 크로스 채널 · Swing 시스템 실시간 연동<br>
+    <a href="DEMO_GUIDE.md" style="color:var(--primary);font-weight:700;text-decoration:none">📖 데모 가이드 (시연 대본·활용법)</a>
+  </div>
+</div>
+</body>
+</html>
